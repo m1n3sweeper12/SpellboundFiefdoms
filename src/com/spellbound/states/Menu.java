@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import com.spellbound.main.Main;
 
-public class Menu extends State{
+public class Menu extends State {
 
 	public Menu(Main main) {
 		super(main);

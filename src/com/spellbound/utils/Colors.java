@@ -9,6 +9,8 @@ public class Colors {
 	
 	// TODO: finish adding color themes
 	public static void initColors() {
+		theme = COLORTHEME.Default;
+		
 		switch(theme) {
 		case Default:
 			red = new Color(181, 62, 68);

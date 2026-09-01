@@ -4,6 +4,11 @@ import java.awt.Canvas;
 
 import javax.swing.JFrame;
 
+/*
+ * Window class handles JFrame and drawing canvas, initializing settings and
+ * storing JFrame and Canvas for access
+ */
+
 public class Window {
 	
 	private JFrame frame;

@@ -6,8 +6,7 @@ import com.spellbound.main.Main;
 
 public abstract class State {
 	
-	@SuppressWarnings("unused")
-	private Main main;
+	protected Main main;
 	
 	public State(Main main) {
 		this.main = main;
