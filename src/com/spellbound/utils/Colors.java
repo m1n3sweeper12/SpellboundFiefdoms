@@ -19,8 +19,8 @@ public class Colors {
 			green = new Color(10, 169, 29);
 			blue = new Color(35, 92, 149);
 			purple = new Color(151, 94, 132);
-			white = new Color(20, 41, 28);
-			black = new Color(231, 223, 231);
+			white = new Color(231, 223, 231);
+			black = new Color(20, 41, 28);
 			break;
 		case Pastel:
 			break;
@@ -35,18 +35,6 @@ public class Colors {
 		default:
 			break;
 		}
-	}
-	
-	public static Color lighten(Color c) {
-		return new Color((c.getRed() + 10 <= 255) ? c.getRed() + 10: 255,
-						(c.getGreen() + 10 <= 255) ? c.getGreen() + 10: 255,
-						(c.getBlue() + 10 <= 255) ? c.getBlue() + 10: 255);
-	}
-	
-	public static Color darken(Color c) {
-		return new Color((c.getRed() - 10 >= 0) ? c.getRed() - 10: 0,
-						(c.getGreen() - 10 >= 0) ? c.getGreen() - 10: 0,
-						(c.getBlue() - 10 >= 0) ? c.getBlue() - 10: 0);
 	}
 	
 }

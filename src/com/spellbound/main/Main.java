@@ -7,6 +7,7 @@ import com.spellbound.states.Game;
 import com.spellbound.states.Menu;
 import com.spellbound.states.STATES;
 import com.spellbound.utils.Colors;
+import com.spellbound.utils.KeyManager;
 
 /*
  * Main method handles game states and overlapping game info.
@@ -35,15 +36,21 @@ public class Main implements Runnable {
 	private Menu menu;
 	private Game game;
 	
+	// input
+	private KeyManager keyManager;
+	
 	public Main(int width, int height, String title) {
 		this.width = width;
 		this.height = height;
 		this.title = title;
+		
+		keyManager = new KeyManager();
 	}
 	
 	private void init() {
 		// init window
 		window = new Window(width, height, title);
+		window.getFrame().addKeyListener(keyManager);
 		
 		Colors.initColors();
 		

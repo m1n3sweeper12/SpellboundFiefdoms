@@ -11,7 +11,6 @@ import java.awt.Rectangle;
 
 public abstract class GameObject {
 	
-	private float x, y;
 	private Rectangle bounds;
 	private int id; // used to track object types for collisions
 	// id list:
@@ -25,8 +24,6 @@ public abstract class GameObject {
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c) {
-		this.x = x;
-		this.y = y;
 		this.bounds = new Rectangle((int)x, (int)y, width, height);
 		this.c = c;
 	}
@@ -36,15 +33,25 @@ public abstract class GameObject {
 	public void render(Graphics2D g) {
 		g.setColor(c);
 		g.fill(bounds);
+		g.setColor(c.darker().darker());
+		g.draw(bounds);
 	}
 	
 	public Rectangle getBounds() {
 		return bounds;
 	}
 	
-	public float[] getPos() {
-		float[] pos = {x, y};
+	public int[] getPos() {
+		int[] pos = {bounds.x, bounds.y};
 		return pos;
+	}
+	
+	public int getX() {
+		return bounds.x;
+	}
+	
+	public int getY() {
+		return bounds.y;
 	}
 	
 	public int getID() {
