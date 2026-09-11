@@ -11,8 +11,8 @@ import java.awt.Rectangle;
 
 public abstract class GameObject {
 	
-	private Rectangle bounds;
-	private int id; // used to track object types for collisions
+	protected Rectangle bounds;
+	protected int id; // used to track object types for collisions
 	// id list:
 	// 0 -> player
 	// 1 -> enemy/hostile
@@ -39,6 +39,10 @@ public abstract class GameObject {
 	
 	public Rectangle getBounds() {
 		return bounds;
+	}
+	
+	public void setBounds(Rectangle bounds) {
+		this.bounds = bounds;
 	}
 	
 	public int[] getPos() {

@@ -10,6 +10,7 @@ import com.spellbound.objects.GameObject;
 import com.spellbound.objects.Hostile;
 import com.spellbound.objects.Passive;
 import com.spellbound.objects.Player;
+import com.spellbound.tiles.Map;
 import com.spellbound.utils.Colors;
 
 public class Game extends State {
@@ -24,12 +25,16 @@ public class Game extends State {
 	private Hostile enemy;
 	private Passive npc;
 	
-	// TEMP, for debugging
-	int timer = 0;
+	// TEMP, for testing 
+	Map test;
 	
 	public Game(Main main) {
 		super(main);
 		objects = new ArrayList<GameObject>();
+		
+		test = new Map();
+		test.loadMapFile("res/test_map.txt");
+		
 		// TEMP, will be handled using implemented file system
 		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(player);
@@ -51,17 +56,25 @@ public class Game extends State {
 	
 	@Override
 	public void tick() {
+		// tick tilemap
+		test.tick();
+		
 		// tick objects
 		for(GameObject o : objects) {
 			o.tick();
 		}
+		
+		player.tick(test);
 	}
 
 	@Override
 	public void render(Graphics2D g) {
 		// background
-		g.setColor(Colors.green.darker().darker());
+		g.setColor(Colors.black);
 		g.fillRect(0, 0, main.getWidth(), main.getHeight());
+		
+		// render tilemap
+		test.render(g);
 		
 		// render objects
 		sortObjects();
