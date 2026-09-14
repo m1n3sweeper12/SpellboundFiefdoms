@@ -1,6 +1,5 @@
 package com.spellbound.objects;
 
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
@@ -51,7 +50,7 @@ public class Player extends GameObject {
 				this.y = t.getBounds().y - Game.TILE_SIZE;
 			}
 			if(leftBounds.intersects(t.getBounds()) && t.isSolid()) {
-				System.out.println("got here");
+				//System.out.println("got here");
 				this.x = t.getBounds().x + Game.TILE_SIZE;
 			}
 			if(rightBounds.intersects(t.getBounds()) && t.isSolid()) {

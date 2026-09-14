@@ -78,7 +78,7 @@ public class Map {
 			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, false, null);
 			break;
 		case 1:
-			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, true, null);
+			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, /*true*/false, null);
 			break;
 		default:
 			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, false, null);

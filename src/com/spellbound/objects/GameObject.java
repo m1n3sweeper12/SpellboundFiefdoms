@@ -54,8 +54,16 @@ public abstract class GameObject {
 		return bounds.x;
 	}
 	
+	public int getCenterX() {
+		return bounds.x + bounds.width/2;
+	}
+	
 	public int getY() {
 		return bounds.y;
+	}
+	
+	public int getCenterY() {
+		return bounds.y + bounds.height/2;
 	}
 	
 	public int getID() {

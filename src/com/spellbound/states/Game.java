@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import com.spellbound.main.Main;
+import com.spellbound.objects.Camera;
 import com.spellbound.objects.GameObject;
 import com.spellbound.objects.Hostile;
 import com.spellbound.objects.Passive;
@@ -21,15 +22,24 @@ public class Game extends State {
 	
 	private Player player;
 	
+	// camera to follow player
+	private Camera cam;
+	
 	// TEMP, for testing Hostile & Passive classes
 	private Hostile enemy;
 	private Passive npc;
+	
+	public static int SCREEN_WIDTH, SCREEN_HEIGHT;
 	
 	// TEMP, for testing 
 	Map test;
 	
 	public Game(Main main) {
 		super(main);
+		
+		SCREEN_WIDTH = main.getWidth();
+		SCREEN_HEIGHT = main.getHeight();
+		
 		objects = new ArrayList<GameObject>();
 		
 		test = new Map();
@@ -45,6 +55,8 @@ public class Game extends State {
 		npc = new Passive(512, 512, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(npc);
 		
+		cam = new Camera(0, 0);
+		
 		// TEMP
 		System.out.println("Color Key:\nblue -> player\nred -> hostile\ngreen -> passive");
 	}
@@ -57,7 +69,15 @@ public class Game extends State {
 	@Override
 	public void tick() {
 		// tick tilemap
-		test.tick();
+		// TEMP, TODO: implement map/level system for file loading/saving
+		//test.tick();
+		
+		// tick camera
+		for(GameObject o : objects) {
+			if(o.getID() == 0) {
+				cam.tick(o);
+			}
+		}
 		
 		// tick objects
 		for(GameObject o : objects) {
@@ -73,14 +93,18 @@ public class Game extends State {
 		g.setColor(Colors.black);
 		g.fillRect(0, 0, main.getWidth(), main.getHeight());
 		
+		g.translate(cam.getX(), cam.getY());
+		
 		// render tilemap
-		test.render(g);
+		//test.render(g);
 		
 		// render objects
 		sortObjects();
 		for(GameObject o : objects) {
 			o.render(g);
 		}
+		
+		g.translate(-cam.getX(), -cam.getY());
 		
 		// *** GUI ***
 		
