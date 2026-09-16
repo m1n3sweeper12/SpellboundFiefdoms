@@ -1,5 +1,6 @@
 package com.spellbound.objects;
 
+import com.spellbound.tiles.Map;
 import com.spellbound.utils.Colors;
 
 public class Passive extends GameObject {
@@ -9,8 +10,8 @@ public class Passive extends GameObject {
 	}
 
 	@Override
-	public void tick() {
-		
+	public void tick(Map m) {
+		tileCollide(m);
 	}
 	
 }

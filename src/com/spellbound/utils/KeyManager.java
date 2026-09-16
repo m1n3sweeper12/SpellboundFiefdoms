@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 public class KeyManager implements KeyListener {
 	
 	public static boolean[] keys = new boolean[256];
-
+	
 	public void keyTyped(KeyEvent e) {
 		
 	}
@@ -22,5 +22,4 @@ public class KeyManager implements KeyListener {
 	public static boolean getKey(int key) {
 		return keys[key];
 	}
-	
 }

@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
+import com.spellbound.states.Game;
+import com.spellbound.tiles.Map;
+import com.spellbound.tiles.Tile;
+import com.spellbound.utils.Colors;
+
 /*
  * GameObject class is an abstract class meant to model any interactive object in the world,
  * including the player, enemies, NPCs, interactive items, etc.
@@ -11,7 +16,10 @@ import java.awt.Rectangle;
 
 public abstract class GameObject {
 	
+	protected float x, y;
+	
 	protected Rectangle bounds;
+	protected Rectangle topBounds, bottomBounds, leftBounds, rightBounds;
 	protected int id; // used to track object types for collisions
 	// id list:
 	// 0 -> player
@@ -24,17 +32,51 @@ public abstract class GameObject {
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c) {
+		this.x = x;
+		this.y = y;
 		this.bounds = new Rectangle((int)x, (int)y, width, height);
+		this.topBounds = new Rectangle((int)(x + 5), (int)(y), width - 10, 5);
+		this.bottomBounds = new Rectangle((int)(x + 5), (int)(y + height - 5), width - 10, 5);
+		this.leftBounds = new Rectangle((int)(x), (int)(y + 5), 5, height - 10);
+		this.rightBounds = new Rectangle((int)(x + width - 5), (int)(y + 5), 5, height - 10);
 		this.c = c;
 	}
 	
-	public abstract void tick();
+	public abstract void tick(Map m);
 	
 	public void render(Graphics2D g) {
 		g.setColor(c);
 		g.fill(bounds);
 		g.setColor(c.darker().darker());
 		g.draw(bounds);
+		if(Game.debugMode) {
+			g.setColor(Colors.red);
+			g.draw(topBounds);
+			g.setColor(Colors.orange);
+			g.draw(bottomBounds);
+			g.setColor(Colors.purple);
+			g.draw(leftBounds);
+			g.setColor(Colors.yellow);
+			g.draw(rightBounds);
+		}
+	}
+	
+	public void tileCollide(Map m) {
+		for(Tile t : m.getTiles()) {
+			if(topBounds.intersects(t.getBounds()) && t.isSolid()) {
+				this.y = t.getBounds().y + Game.TILE_SIZE;
+			}
+			if(bottomBounds.intersects(t.getBounds()) && t.isSolid()) {
+				this.y = t.getBounds().y - Game.TILE_SIZE;
+			}
+			if(leftBounds.intersects(t.getBounds()) && t.isSolid()) {
+				//System.out.println("got here");
+				this.x = t.getBounds().x + Game.TILE_SIZE;
+			}
+			if(rightBounds.intersects(t.getBounds()) && t.isSolid()) {
+				this.x = t.getBounds().x - Game.TILE_SIZE;
+			}
+		}
 	}
 	
 	public Rectangle getBounds() {
