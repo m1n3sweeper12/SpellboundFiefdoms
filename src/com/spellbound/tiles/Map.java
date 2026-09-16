@@ -1,6 +1,5 @@
 package com.spellbound.tiles;
 
-import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,20 +11,10 @@ public class Map {
 	
 	private ArrayList<Tile> tiles;
 	
+	public static int MAP_WIDTH, MAP_HEIGHT;
+	
 	public Map() {
 		this.tiles = new ArrayList<>();
-	}
-	
-	public void tick() {
-		for(Tile t : tiles) {
-			t.tick();
-		}
-	}
-	
-	public void render(Graphics2D g) {
-		for(Tile t : tiles) {
-			t.render(g);
-		}
 	}
 	
 	public void loadMapFile(String path) {
@@ -37,7 +26,8 @@ public class Map {
 			int width = in.nextInt();
 			int height = in.nextInt();
 			
-			//System.out.println("width: " + width + " | height: " + height);
+			MAP_WIDTH = width*Game.TILE_SIZE;
+			MAP_HEIGHT = height*Game.TILE_SIZE;
 			
 			while(in.hasNext()) {
 				int layer = in.nextInt();
@@ -69,6 +59,8 @@ public class Map {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println(MAP_WIDTH + " | " + MAP_HEIGHT);
 	}
 	
 	private void loadTile(int x, int y, int tileID) {

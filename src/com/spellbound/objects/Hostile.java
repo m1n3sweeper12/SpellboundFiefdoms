@@ -1,5 +1,6 @@
 package com.spellbound.objects;
 
+import com.spellbound.tiles.Map;
 import com.spellbound.utils.Colors;
 
 public class Hostile extends GameObject {
@@ -9,7 +10,9 @@ public class Hostile extends GameObject {
 	}
 
 	@Override
-	public void tick() {
+	public void tick(Map m) {
+		tileCollide(m);
+		
 		
 	}
 
