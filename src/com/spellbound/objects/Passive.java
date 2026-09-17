@@ -11,6 +11,8 @@ public class Passive extends GameObject {
 
 	@Override
 	public void tick(Map m) {
+		move();
+		
 		tileCollide(m);
 	}
 	

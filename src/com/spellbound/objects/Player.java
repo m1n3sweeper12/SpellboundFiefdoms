@@ -1,6 +1,5 @@
 package com.spellbound.objects;
 
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import com.spellbound.tiles.Map;
@@ -29,13 +28,13 @@ public class Player extends GameObject {
 	@Override
 	public void tick(Map m) {
 		// player movement
-		move();
+		movePlayer();
 		
 		// tile collisions
-		tileCollide(m);
+		//tileCollide(m);
 	}
 	
-	private void move() {
+	private void movePlayer() {
 		if(runStamina < maxRun)
 			runStamina += 0.5;
 		if(runStamina < 0) {
@@ -66,11 +65,7 @@ public class Player extends GameObject {
 			this.x += speed;
 		}
 		
-		this.setBounds(new Rectangle((int)x, (int)y, width, height));
-		this.topBounds = new Rectangle((int)(x + 5), (int)(y), width - 10, 5);
-		this.bottomBounds = new Rectangle((int)(x + 5), (int)(y + height - 5), width - 10, 5);
-		this.leftBounds = new Rectangle((int)(x), (int)(y + 5), 5, height - 10);
-		this.rightBounds = new Rectangle((int)(x + width - 5), (int)(y + 5), 5, height - 10);
+		this.move();
 	}
 	
 	public void setY(float y) {

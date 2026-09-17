@@ -9,6 +9,8 @@ import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
 import com.spellbound.utils.Colors;
 
+import javafx.scene.shape.Circle;
+
 /*
  * GameObject class is an abstract class meant to model any interactive object in the world,
  * including the player, enemies, NPCs, interactive items, etc.
@@ -20,6 +22,9 @@ public abstract class GameObject {
 	
 	protected Rectangle bounds;
 	protected Rectangle topBounds, bottomBounds, leftBounds, rightBounds;
+	
+	protected Circle strikeRad;
+	
 	protected int id; // used to track object types for collisions
 	// id list:
 	// 0 -> player
@@ -61,7 +66,21 @@ public abstract class GameObject {
 		}
 	}
 	
-	public void tileCollide(Map m) {
+	protected void move() {
+		this.bounds.x = (int)this.x;
+		this.bounds.y = (int)this.y;
+		this.topBounds.x = (int)this.x + 5;
+		this.topBounds.y = (int)this.y;
+		this.bottomBounds.x = (int)this.x + 5;
+		this.bottomBounds.y = (int)this.y + this.bounds.height - 5;
+		this.leftBounds.x = (int)this.x;
+		this.leftBounds.y = (int)this.y + 5;
+		this.rightBounds.x = (int)this.x + this.bounds.width - 5;
+		this.rightBounds.y = (int)this.y + 5;
+	}
+	
+	protected void tileCollide(Map m) {
+		
 		for(Tile t : m.getTiles()) {
 			if(topBounds.intersects(t.getBounds()) && t.isSolid()) {
 				this.y = t.getBounds().y + Game.TILE_SIZE;

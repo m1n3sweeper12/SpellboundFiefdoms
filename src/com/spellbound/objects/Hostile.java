@@ -11,9 +11,9 @@ public class Hostile extends GameObject {
 
 	@Override
 	public void tick(Map m) {
-		tileCollide(m);
+		this.move();
 		
-		
+		this.tileCollide(m);
 	}
 
 }
