@@ -50,11 +50,13 @@ public abstract class GameObject {
 	public abstract void tick(Map m);
 	
 	public void render(Graphics2D g) {
+		// TEMP
 		g.setColor(c);
 		g.fill(bounds);
 		g.setColor(c.darker().darker());
 		g.draw(bounds);
 		if(Game.debugMode) {
+			// draw collision bounds
 			g.setColor(Colors.red);
 			g.draw(topBounds);
 			g.setColor(Colors.orange);

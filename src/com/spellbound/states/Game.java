@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import com.spellbound.main.Main;
 import com.spellbound.objects.Camera;
+import com.spellbound.objects.EnemyTest;
 import com.spellbound.objects.GameObject;
 import com.spellbound.objects.Hostile;
 import com.spellbound.objects.Passive;
@@ -20,6 +21,8 @@ import com.spellbound.utils.KeyManager;
 public class Game extends State {
 	
 	private ArrayList<GameObject> objects;
+	private ArrayList<Hostile> enemies;
+	private ArrayList<Passive> passives;
 	
 	public static final int TILE_SIZE = 32;
 	
@@ -29,7 +32,7 @@ public class Game extends State {
 	private Camera cam;
 	
 	// TEMP, for testing Hostile & Passive classes
-	private Hostile enemy;
+	private EnemyTest e;
 	private Passive npc;
 	
 	public static int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -48,6 +51,8 @@ public class Game extends State {
 		SCREEN_HEIGHT = main.getHeight();
 		
 		objects = new ArrayList<GameObject>();
+		enemies = new ArrayList<Hostile>();
+		passives = new ArrayList<Passive>();
 		
 		test = new Map();
 		test.loadMapFile("res/test_map.txt");
@@ -58,11 +63,13 @@ public class Game extends State {
 		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(player);
 		
-		enemy = new Hostile(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
-		objects.add(enemy);
+		e = new EnemyTest(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
+		objects.add(e);
+		enemies.add(e);
 		
 		npc = new Passive(512, 512, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(npc);
+		passives.add(npc);
 		
 		cam = new Camera(0, 0);
 		
@@ -89,6 +96,12 @@ public class Game extends State {
 					&& t.getBounds().y > (player.getY() - Game.SCREEN_HEIGHT)
 					&& t.getBounds().y < (player.getY() + Game.SCREEN_HEIGHT)) {
 				t.tick();
+			}
+		}
+		
+		for(Hostile h : enemies) {
+			if(h.isPlayerSeen()) {
+				
 			}
 		}
 		
