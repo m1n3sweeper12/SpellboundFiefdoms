@@ -4,22 +4,30 @@ import java.awt.Rectangle;
 import java.util.Random;
 
 import com.spellbound.tiles.Map;
+import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
 
 public abstract class Hostile extends GameObject {
 	
 	protected boolean playerSeen;
 	protected MOBSTATES state;
-	protected Rectangle moveArea;
-	private int moveTimer, speed;
+	
+	// roaming variables
+	protected Rectangle roamArea; // tracks area in which hostile can roam
+	private int moveTimer, roamSpeed;	// moveTimer randomly selects time between movements
+										// roamSpeed tracks hostile speed while roaming
+	private int xDir, yDir, xDist, yDist; // Dir tracks direction of movement, dist tracks distance of movement
 	
 	private Random r;
 	
-	public Hostile(float x, float y, int width, int height, int moveDist, int speed) {
-		super(x, y, width, height, 1, Colors.red);
+	protected Circle strikeArea;
+	
+	public Hostile(float x, float y, int width, int height, int moveDist, int roamSpeed, int damageAreaRad, int strikeAreaRad, int power, int hp) {
+		super(x, y, width, height, 1, Colors.red, damageAreaRad, strikeAreaRad, power, hp);
 		this.state = MOBSTATES.Roam;
-		this.moveArea = new Rectangle((int)(x - moveDist), (int)(y - moveDist), moveDist*2, moveDist*2);
-		this.speed = speed;
+		this.roamArea = new Rectangle((int)(x - moveDist), (int)(y - moveDist), moveDist*2, moveDist*2);
+		this.roamSpeed = roamSpeed;
+		this.strikeArea = new Circle(x + width/2, y + height/2, strikeAreaRad);
 		
 		this.r = new Random((long)(x + y));
 	}
@@ -44,22 +52,35 @@ public abstract class Hostile extends GameObject {
 	}
 	
 	public void roam() {
-		int xDir = 0, yDir = 0;
 		if(moveTimer <= 0) {
-			int[] nextPoint = new int[2];
+			xDir = r.nextInt(2);
+			yDir = r.nextInt(2);
 			
-			nextPoint[0] = r.nextInt(moveArea.x, moveArea.x + moveArea.width);
-			nextPoint[1] = r.nextInt(moveArea.y, moveArea.y + moveArea.height);
+			if(xDir == 0) {
+				xDir = -1;
+			}
 			
-			moveTimer = r.nextInt(200, 5000);
+			if(yDir == 0) {
+				yDir = -1;
+			}
+			
+			xDist = r.nextInt(roamArea.width);
+			yDist = r.nextInt(roamArea.height);
+			
+			//moveTimer = r.nextInt(200, 1000);
+			moveTimer = 200;
 		} else {
-			x += xDir*speed;
-			y += yDir*speed;
-			
 			moveTimer--;
 		}
 		
-		
+		if(xDist > 0) {
+			this.x += xDir*roamSpeed;
+			xDist -= roamSpeed;
+		}
+		if(yDist > 0) {
+			this.y += yDir*roamSpeed;
+			yDist -= roamSpeed;
+		}
 	}
 	
 	public void chase() {
@@ -84,6 +105,10 @@ public abstract class Hostile extends GameObject {
 	
 	public void setState(MOBSTATES state) {
 		this.state = state;
+	}
+	
+	public Circle getStrikeArea() {
+		return strikeArea;
 	}
 
 }

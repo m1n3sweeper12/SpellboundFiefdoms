@@ -2,15 +2,20 @@ package com.spellbound.states;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Line2D.Double;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import com.spellbound.main.Main;
 import com.spellbound.objects.Camera;
 import com.spellbound.objects.EnemyTest;
 import com.spellbound.objects.GameObject;
 import com.spellbound.objects.Hostile;
+import com.spellbound.objects.MOBSTATES;
 import com.spellbound.objects.Passive;
 import com.spellbound.objects.Player;
 import com.spellbound.tiles.Map;
@@ -21,12 +26,12 @@ import com.spellbound.utils.KeyManager;
 public class Game extends State {
 	
 	private ArrayList<GameObject> objects;
-	private ArrayList<Hostile> enemies;
+	private static ArrayList<Hostile> enemies;
 	private ArrayList<Passive> passives;
 	
 	public static final int TILE_SIZE = 32;
 	
-	private Player player;
+	private static Player player;
 	
 	// camera to follow player
 	private Camera cam;
@@ -60,14 +65,14 @@ public class Game extends State {
 		currentMap = test;
 		
 		// TEMP, will be handled using implemented file system
-		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE);
+		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE + 10);
 		objects.add(player);
 		
 		e = new EnemyTest(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(e);
 		enemies.add(e);
 		
-		npc = new Passive(512, 512, Game.TILE_SIZE, Game.TILE_SIZE);
+		npc = new Passive(512, 512, Game.TILE_SIZE, Game.TILE_SIZE, 100);
 		objects.add(npc);
 		passives.add(npc);
 		
@@ -75,6 +80,58 @@ public class Game extends State {
 		
 		// TEMP
 		System.out.println("Color Key:\nblue -> player\nred -> hostile\ngreen -> passive");
+	}
+	
+	public static void playerAttack() {
+		Line2D.Double attackLine = getAttackLine((GameObject)player);
+		for(GameObject o : enemies) {
+			if(attackLine.intersects(o.getDamageArea())) {
+				o.damage(player.getPower());
+			}
+		}
+	}
+	
+	private static Line2D.Double getAttackLine(GameObject o) {
+		Line2D.Double l;
+		
+		switch(o.getDirection()) {
+		case 0: // east
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY());
+			break;
+		case 1: // south east
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() + o.getStrikeDist()), (double)(o.getCenterY() + o.getStrikeDist()));
+			break;
+		case 2: // south
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX()), (double)o.getCenterY() + o.getStrikeDist());
+			break;
+		case 3: // south west
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() + o.getStrikeDist());
+			break;
+		case 4: // west
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY());
+			break;
+		case 5: // north west
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
+			break;
+		case 6: // north
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX()), (double)o.getCenterY() - o.getStrikeDist());
+			break;
+		case 7: // north east
+			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
+					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
+			break;
+		default:
+			l = new Line2D.Double();
+		}
+		
+		return l;
 	}
 	
 	private void sortObjects() {
@@ -101,7 +158,7 @@ public class Game extends State {
 		
 		for(Hostile h : enemies) {
 			if(h.isPlayerSeen()) {
-				
+				h.setState(MOBSTATES.Chase);
 			}
 		}
 		
@@ -112,6 +169,10 @@ public class Game extends State {
 		for(GameObject o : objects) {
 			o.tick(test);
 		}
+		
+		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0);
+		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0);
+		objects.removeIf(ob -> ob.getHP() <= 0);
 		
 		sortObjects();
 		
@@ -149,6 +210,8 @@ public class Game extends State {
 		for(GameObject o : objects) {
 			o.render(g);
 		}
+		
+		// DEBUG MODE
 		
 		g.translate(cam.getX(), cam.getY());
 		
