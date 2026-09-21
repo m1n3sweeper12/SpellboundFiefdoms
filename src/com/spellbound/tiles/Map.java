@@ -24,7 +24,6 @@ public class Map {
 		cliff = ImageLoader.loadImage("res/sprites/tiles/tileset_cliff.png");
 		loadTileArray(path_tiles, path, 16, 16);
 		loadTileArray(cliff_tiles, cliff, 16, 16);
-		
 	}
 	
 	private void loadTileArray(BufferedImage[] arr, BufferedImage img, int width, int height) {

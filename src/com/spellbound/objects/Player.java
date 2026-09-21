@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
-import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
 import com.spellbound.utils.KeyManager;
 
@@ -24,6 +23,10 @@ public class Player extends GameObject {
 		this.walkSpeed = 2;
 		this.runSpeed = 4;
 		this.direction = 0;
+	}
+	
+	public void loadAnimations() {
+		
 	}
 	
 	@Override
