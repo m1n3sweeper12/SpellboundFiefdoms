@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
+import com.spellbound.utils.Animation;
 import com.spellbound.utils.Colors;
 
 /*
@@ -38,7 +39,7 @@ public abstract class GameObject {
 	protected boolean canAttack, attacking;
 	protected int hp;
 	
-	
+	protected Animation currAnim;
 	
 	protected int id; // used to track object types for collisions
 	// id list:
@@ -83,6 +84,9 @@ public abstract class GameObject {
 		g.fill(bounds);
 		g.setColor(c.darker().darker());
 		g.draw(bounds);
+		
+		g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
+		
 		if(Game.debugMode) {
 			// draw collision bounds
 			g.setColor(Colors.red);
