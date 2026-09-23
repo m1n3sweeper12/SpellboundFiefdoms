@@ -4,9 +4,9 @@ import java.awt.event.KeyEvent;
 
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
-import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
 import com.spellbound.utils.KeyManager;
+import com.spellbound.utils.SpriteHandler;
 
 public class Player extends GameObject {
 	
@@ -14,7 +14,7 @@ public class Player extends GameObject {
 	
 	private int speed, walkSpeed, runSpeed;
 	private double runStamina = 200, maxRun = 200, minRun = 100;
-	private boolean canRun = true;//, isRunning = false;
+	private boolean canRun = true, isRunning = false, canWalk = true, isWalking = false;
 	
 	public Player(float x, float y, int width, int height, int strikeAreaRad) {
 		super(x, y, width, height, 0, Colors.blue, Game.TILE_SIZE, strikeAreaRad, 10, 200);
@@ -24,6 +24,8 @@ public class Player extends GameObject {
 		this.walkSpeed = 2;
 		this.runSpeed = 4;
 		this.direction = 0;
+		
+		currAnim = SpriteHandler.player_idleD;
 	}
 	
 	@Override
@@ -42,11 +44,11 @@ public class Player extends GameObject {
 			canAttack = true;
 		}
 		
+		currAnim.run();
+		
 		// tile collisions
 		if(!Game.debugMode)
 			tileCollide(m);
-		
-		System.out.println(canAttack);
 	}
 	
 	private void movePlayer() {
@@ -60,30 +62,81 @@ public class Player extends GameObject {
 		}
 		if(KeyManager.getKey(KeyEvent.VK_SHIFT) && canRun) {
 			speed = runSpeed;
-			//isRunning = true;
+			isRunning = true;
 			runStamina -= 2;
 		} else {
 			speed = walkSpeed;
-			//isRunning = false;
+			isRunning = false;
 		}
 		
 		if(KeyManager.getKey(KeyEvent.VK_W)) {
 			this.y -= speed;
+			isWalking = true;
 		}
 		if(KeyManager.getKey(KeyEvent.VK_S)) {
 			this.y += speed;
+			isWalking = true;
 		}
 		if(KeyManager.getKey(KeyEvent.VK_A)) {
 			this.x -= speed;
+			isWalking = true;
 		}
 		if(KeyManager.getKey(KeyEvent.VK_D)) {
 			this.x += speed;
+			isWalking = true;
 		}
 		
+		if(!KeyManager.getKey(KeyEvent.VK_W) && !KeyManager.getKey(KeyEvent.VK_A) &&
+				!KeyManager.getKey(KeyEvent.VK_S) && !KeyManager.getKey(KeyEvent.VK_D))
+			isWalking = false;
+		
 		setDirection();
-		System.out.println(direction);
+		
+		if(isRunning) {
+			setAnimation(2);
+		} else if(isWalking) {
+			setAnimation(1);
+		} else {
+			setAnimation(0);
+		}
 		
 		this.move();
+	}
+	
+	private void setAnimation(int mode) {
+		switch(mode) {
+		case 1: // walking
+			if(direction == 0 || direction == 1)
+				currAnim = SpriteHandler.player_walkR;
+			else if(direction == 2 || direction == 3)
+				currAnim = SpriteHandler.player_walkD;
+			else if(direction == 4 || direction == 5)
+				currAnim = SpriteHandler.player_walkL;
+			else if(direction == 6 || direction == 7)
+				currAnim = SpriteHandler.player_walkU;
+			break;
+		case 2: // running
+			if(direction == 0 || direction == 1)
+				currAnim = SpriteHandler.player_runR;
+			else if(direction == 2 || direction == 3)
+				currAnim = SpriteHandler.player_runD;
+			else if(direction == 4 || direction == 5)
+				currAnim = SpriteHandler.player_runL;
+			else if(direction == 6 || direction == 7)
+				currAnim = SpriteHandler.player_runU;
+			break;
+		case 0:
+		default:
+			if(direction == 0 || direction == 1)
+				currAnim = SpriteHandler.player_idleR;
+			else if(direction == 2 || direction == 3)
+				currAnim = SpriteHandler.player_idleD;
+			else if(direction == 4 || direction == 5)
+				currAnim = SpriteHandler.player_idleL;
+			else if(direction == 6 || direction == 7)
+				currAnim = SpriteHandler.player_idleU;
+			break;
+		}
 	}
 	
 	private void setDirection() {

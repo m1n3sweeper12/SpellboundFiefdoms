@@ -22,6 +22,7 @@ import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
 import com.spellbound.utils.Colors;
 import com.spellbound.utils.KeyManager;
+import com.spellbound.utils.SpriteHandler;
 
 public class Game extends State {
 	
@@ -29,7 +30,7 @@ public class Game extends State {
 	private static ArrayList<Hostile> enemies;
 	private ArrayList<Passive> passives;
 	
-	public static final int TILE_SIZE = 32;
+	public static final int TILE_SIZE = 64;
 	
 	private static Player player;
 	
@@ -54,6 +55,8 @@ public class Game extends State {
 		
 		SCREEN_WIDTH = main.getWidth();
 		SCREEN_HEIGHT = main.getHeight();
+		
+		SpriteHandler.loadAssets();
 		
 		objects = new ArrayList<GameObject>();
 		enemies = new ArrayList<Hostile>();
@@ -141,12 +144,12 @@ public class Game extends State {
 	
 	@Override
 	public void tick() {
+		// infinite running in debug mode
 		if(debugMode) {
 			player.setRunStamina(200);
 		}
 		
 		// only tick tiles that are visible on screen
-		// TODO: 
 		for(Tile t : currentMap.getTiles()) {
 			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
 					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
@@ -156,6 +159,7 @@ public class Game extends State {
 			}
 		}
 		
+		// make enemies chase player
 		for(Hostile h : enemies) {
 			if(h.isPlayerSeen()) {
 				h.setState(MOBSTATES.Chase);
@@ -170,6 +174,7 @@ public class Game extends State {
 			o.tick(test);
 		}
 		
+		// remove objects if health reaches 0
 		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0);
 		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0);
 		objects.removeIf(ob -> ob.getHP() <= 0);
@@ -180,7 +185,6 @@ public class Game extends State {
 		if(KeyManager.getKey(KeyEvent.VK_X) && debugToggle) {
 			debugMode = !debugMode;
 			debugToggle = false;
-			System.out.println(debugMode);
 		}
 		
 		if(!KeyManager.getKey(KeyEvent.VK_X)) {

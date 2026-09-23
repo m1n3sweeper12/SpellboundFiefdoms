@@ -6,6 +6,7 @@ import java.util.Random;
 import com.spellbound.tiles.Map;
 import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
+import com.spellbound.utils.SpriteHandler;
 
 public abstract class Hostile extends GameObject {
 	
@@ -48,7 +49,26 @@ public abstract class Hostile extends GameObject {
 		
 		this.move();
 		
+		this.setAnimation();
+		
+		currAnim.run();
+		
 		this.tileCollide(m);
+	}
+	
+	private void setAnimation() {
+		if(xDist > 0) {
+			if(xDir > 0) currAnim = SpriteHandler.enemy_walkR;
+			else if(xDir < 0) currAnim = SpriteHandler.enemy_walkL;
+		} else if(yDist > 0) {
+			if(yDir > 0) currAnim = SpriteHandler.enemy_walkD;
+			else if(yDir < 0) currAnim = SpriteHandler.enemy_walkU;
+		} else {
+			if(xDir > 0) currAnim = SpriteHandler.enemy_idleR;
+			else if(xDir < 0) currAnim = SpriteHandler.enemy_idleL;
+			else if(yDir > 0) currAnim = SpriteHandler.enemy_idleD;
+			else if(yDir < 0) currAnim = SpriteHandler.enemy_idleU;
+		}
 	}
 	
 	public void roam() {
