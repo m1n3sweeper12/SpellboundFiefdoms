@@ -10,12 +10,14 @@ public class Passive extends GameObject {
 	public Passive(float x, float y, int width, int height, int hp) {
 		super(x, y, width, height, 2, Colors.green, Game.TILE_SIZE + 5, 0, 0, hp);
 		// TEMP
-		currAnim = SpriteHandler.player_idleU;
+		currAnim = SpriteHandler.serf1_idleD;
 	}
 
 	@Override
 	public void tick(Map m) {
 		move();
+		
+		currAnim.run();
 		
 		tileCollide(m);
 	}

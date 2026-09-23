@@ -1,13 +1,12 @@
 package com.spellbound.tiles;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.spellbound.states.Game;
-import com.spellbound.utils.ImageLoader;
+import com.spellbound.utils.SpriteHandler;
 
 public class Map {
 	
@@ -15,18 +14,11 @@ public class Map {
 	
 	public static int MAP_WIDTH, MAP_HEIGHT;
 	
-	private BufferedImage path, cliff;
-	private BufferedImage[] path_tiles, cliff_tiles;
-	
 	public Map() {
 		this.tiles = new ArrayList<>();
-		path = ImageLoader.loadImage("res/sprites/tiles/tileset_path.png");
-		cliff = ImageLoader.loadImage("res/sprites/tiles/tileset_cliff.png");
-		loadTileArray(path_tiles, path, 16, 16);
-		loadTileArray(cliff_tiles, cliff, 16, 16);
 	}
 	
-	private void loadTileArray(BufferedImage[] arr, BufferedImage img, int width, int height) {
+	/*private void loadTileArray(BufferedImage[] arr, BufferedImage img, int width, int height) {
 		arr = new BufferedImage[width*height];
 		
 		int rows = img.getHeight()/height;
@@ -40,7 +32,7 @@ public class Map {
 				index++;
 			}
 		}
-	}
+	}*/
 	
 	public void loadMapFile(String path) {
 		try {
@@ -58,7 +50,6 @@ public class Map {
 				int layer = in.nextInt();
 				switch(layer) {
 				case 0: // path tiles layer
-					//System.out.println("got here");
 					for(int y = 0; y < height; y++) {
 						for(int x = 0; x < width; x++) {
 							int tileID = in.nextInt();
@@ -86,20 +77,25 @@ public class Map {
 	}
 	
 	private void loadTile(int x, int y, int layer, int tileID) {
+		
+		if(layer == 1 && tileID == 0)
+			return;
+		
 		Tile t;
 		switch(tileID) {
 		case 0: // default tile
-			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, false, null);
+			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, false, SpriteHandler.path_tiles[47]);
 			break;
-		case 1:
-			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, true, null);
+		case 1: // solid wall
+			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, true, SpriteHandler.cliff_tiles[49]);
 			break;
 		default:
-			t = new Tile(x*Game.TILE_SIZE, y*Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE, tileID, false, null);
+			t = null;
 			break;
 		}
 		
-		tiles.add(t);
+		if(t != null)
+			tiles.add(t);
 	}
 	
 	public ArrayList<Tile> getTiles() {

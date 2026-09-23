@@ -79,15 +79,17 @@ public abstract class GameObject {
 	public abstract void tick(Map m);
 	
 	public void render(Graphics2D g) {
-		// TEMP
-		g.setColor(c);
-		g.fill(bounds);
-		g.setColor(c.darker().darker());
-		g.draw(bounds);
-		
-		g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
 		
 		if(Game.debugMode) {
+			// draw bounds
+			g.setColor(c);
+			g.fill(bounds);
+			g.setColor(c.darker().darker());
+			g.draw(bounds);
+			
+			// draw animation
+			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
+			
 			// draw collision bounds
 			g.setColor(Colors.red);
 			g.draw(topBounds);
@@ -103,6 +105,9 @@ public abstract class GameObject {
 			g.draw(damageArea);
 			g.setColor(Colors.black);
 			g.draw(strikeArea);
+		} else {
+			// draw animation
+			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
 		}
 	}
 	

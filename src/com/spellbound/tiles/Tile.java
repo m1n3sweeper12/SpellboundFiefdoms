@@ -29,7 +29,7 @@ public class Tile {
 				c = Colors.green.brighter().brighter();
 				break;
 			case 1:
-				c = Colors.black.brighter().brighter();
+				c = Colors.black;
 				break;
 			default:
 				c = Colors.white;
@@ -50,7 +50,7 @@ public class Tile {
 		else {
 			g.setColor(c);
 			g.fill(bounds);
-			g.setColor(c.darker().darker());
+			g.setColor(c.darker());
 			g.draw(bounds);
 		}
 	}

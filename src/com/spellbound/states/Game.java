@@ -30,7 +30,7 @@ public class Game extends State {
 	private static ArrayList<Hostile> enemies;
 	private ArrayList<Passive> passives;
 	
-	public static final int TILE_SIZE = 32;
+	public static final int TILE_SIZE = 64;
 	
 	private static Player player;
 	
@@ -185,7 +185,6 @@ public class Game extends State {
 		if(KeyManager.getKey(KeyEvent.VK_X) && debugToggle) {
 			debugMode = !debugMode;
 			debugToggle = false;
-			System.out.println(debugMode);
 		}
 		
 		if(!KeyManager.getKey(KeyEvent.VK_X)) {

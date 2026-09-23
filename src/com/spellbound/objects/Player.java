@@ -49,8 +49,6 @@ public class Player extends GameObject {
 		// tile collisions
 		if(!Game.debugMode)
 			tileCollide(m);
-		
-		System.out.println(canAttack);
 	}
 	
 	private void movePlayer() {
