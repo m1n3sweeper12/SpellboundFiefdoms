@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
+import com.spellbound.inventory.Inventory;
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
@@ -48,8 +49,10 @@ public abstract class GameObject {
 	// 2 -> NPC/passive
 	// 3 -> item
 	
-	//TEMP, could be used for bounds debugging later
+	// used for bounds debugging
 	Color c;
+	
+	protected Inventory inv;
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c, int damageAreaRad, int strikeAreaRad, int power, int hp) {
@@ -74,6 +77,7 @@ public abstract class GameObject {
 		this.attacking = false;
 		// tracks health points
 		this.hp = hp;
+		this.inv = new Inventory(10);
 	}
 	
 	public abstract void tick(Map m);
@@ -214,6 +218,10 @@ public abstract class GameObject {
 	
 	public void setPower(int power) {
 		this.power = power;
+	}
+	
+	public Inventory getInventory() {
+		return inv;
 	}
 	
 }

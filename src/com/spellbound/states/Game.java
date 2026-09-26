@@ -2,13 +2,10 @@ package com.spellbound.states;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import com.spellbound.main.Main;
 import com.spellbound.objects.Camera;
@@ -239,6 +236,9 @@ public class Game extends State {
 		g.fillRect(150, 10, (int)player.getRunStamina(), 20);
 		g.setColor(Colors.black);
 		g.drawRect(150, 10, 200, 20);
+		
+		// render player inventory
+		player.getInventory().render(g);
 		
 		// DEBUG MODE
 		if(debugMode) {

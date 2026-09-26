@@ -2,9 +2,11 @@ package com.spellbound.objects;
 
 import java.awt.event.KeyEvent;
 
+import com.spellbound.inventory.Item;
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
 import com.spellbound.utils.Colors;
+import com.spellbound.utils.ImageLoader;
 import com.spellbound.utils.KeyManager;
 import com.spellbound.utils.SpriteHandler;
 
@@ -26,6 +28,9 @@ public class Player extends GameObject {
 		this.direction = 0;
 		
 		currAnim = SpriteHandler.player_idleD;
+		
+		inv.addItem(new Item("Test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
+		inv.addItem(new Item("Test", 99, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
 	}
 	
 	@Override
