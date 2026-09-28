@@ -7,18 +7,19 @@ import com.spellbound.states.Game;
 
 public class Item {
 	
-	private String name;
+	private String name, type;
 	private int quantity;
 	private int x, y;
 	private BufferedImage img;
 	public static final int MAX_QUANTITY = 99;
 	
-	public Item(String name, int quantity, int x, int y, BufferedImage img) {
+	public Item(String name, String type, int quantity, int x, int y, BufferedImage img) {
 		this.name = name;
 		this.quantity = quantity;
 		this.x = x;
 		this.y = y;
 		this.img = img;
+		this.type = type;
 	}
 	
 	public void render(Graphics2D g) {
@@ -55,6 +56,14 @@ public class Item {
 	
 	public void setY(int y) {
 		this.y = y;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

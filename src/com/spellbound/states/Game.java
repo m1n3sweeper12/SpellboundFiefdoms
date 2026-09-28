@@ -7,6 +7,7 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import com.spellbound.inventory.Inventory;
 import com.spellbound.main.Main;
 import com.spellbound.objects.Camera;
 import com.spellbound.objects.EnemyTest;
@@ -238,7 +239,8 @@ public class Game extends State {
 		g.drawRect(150, 10, 200, 20);
 		
 		// render player inventory
-		player.getInventory().render(g);
+		Inventory UIInv = new Inventory(player.getInventory());
+		UIInv.render(g);
 		
 		// DEBUG MODE
 		if(debugMode) {

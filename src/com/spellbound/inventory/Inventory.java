@@ -9,12 +9,20 @@ import com.spellbound.utils.Colors;
 
 public class Inventory {
 	
-	public ArrayList<Item> items;
-	public int slots;
+	private ArrayList<Item> items;
+	private int slots;
+	private int highSlot;
 	
 	public Inventory(int slots) {
 		this.slots = slots;
 		items = new ArrayList<Item>(slots);
+		highSlot = 0;
+	}
+	
+	public Inventory(Inventory i) {
+		this.slots = i.getSlots();
+		this.items = i.getItems();
+		highSlot = 0;
 	}
 	
 	public void addItem(Item item, int slot) {
@@ -54,7 +62,6 @@ public class Inventory {
 				item.setY(100+2+68*i+16);
 				item.render(g);
 				if(item.getQuantity() > 1) {
-					System.out.println("got here");
 					g.setColor(Colors.black);
 					g.setFont(new Font("Sansserif", Font.BOLD, 16));
 					g.drawString(item.getQuantity() + "", 15+16+32, 100+2+68*i+16+4);
@@ -65,7 +72,19 @@ public class Inventory {
 		// draw highlighted item
 		g.setColor(Colors.yellow);
 		g.setStroke(new BasicStroke(2));
-		g.drawRect(15, 100, 68, 68);
+		g.drawRect(15, 100 + 68*highSlot, 68, 68);
+	}
+	
+	public ArrayList<Item> getItems() {
+		return items;
+	}
+	
+	public int getSlots() {
+		return slots;
+	}
+	
+	public int getHighlightedSlot() {
+		return highSlot;
 	}
 	
 }

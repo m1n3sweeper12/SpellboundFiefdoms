@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 import com.spellbound.inventory.Inventory;
+import com.spellbound.inventory.Item;
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
@@ -47,12 +48,12 @@ public abstract class GameObject {
 	// 0 -> player
 	// 1 -> enemy/hostile
 	// 2 -> NPC/passive
-	// 3 -> item
 	
 	// used for bounds debugging
 	Color c;
 	
 	protected Inventory inv;
+	protected Item currItem;
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c, int damageAreaRad, int strikeAreaRad, int power, int hp) {
@@ -78,6 +79,7 @@ public abstract class GameObject {
 		// tracks health points
 		this.hp = hp;
 		this.inv = new Inventory(10);
+		this.currItem = null;
 	}
 	
 	public abstract void tick(Map m);
@@ -90,6 +92,11 @@ public abstract class GameObject {
 			g.fill(bounds);
 			g.setColor(c.darker().darker());
 			g.draw(bounds);
+			
+			// draw current Item
+			if(currItem != null) {
+				currItem.render(g);
+			}
 			
 			// draw animation
 			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
@@ -110,6 +117,11 @@ public abstract class GameObject {
 			g.setColor(Colors.black);
 			g.draw(strikeArea);
 		} else {
+			// draw current Item
+			if(currItem != null) {
+				currItem.render(g);
+			}
+			
 			// draw animation
 			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
 		}

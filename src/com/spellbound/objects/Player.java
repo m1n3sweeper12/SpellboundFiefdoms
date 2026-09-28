@@ -1,5 +1,6 @@
 package com.spellbound.objects;
 
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import com.spellbound.inventory.Item;
@@ -17,6 +18,7 @@ public class Player extends GameObject {
 	private int speed, walkSpeed, runSpeed;
 	private double runStamina = 200, maxRun = 200, minRun = 100;
 	private boolean canRun = true, isRunning = false, canWalk = true, isWalking = false;
+	private boolean canSwap = true;
 	
 	public Player(float x, float y, int width, int height, int strikeAreaRad) {
 		super(x, y, width, height, 0, Colors.blue, Game.TILE_SIZE, strikeAreaRad, 10, 200);
@@ -29,8 +31,9 @@ public class Player extends GameObject {
 		
 		currAnim = SpriteHandler.player_idleD;
 		
-		inv.addItem(new Item("Test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
-		inv.addItem(new Item("Test", 99, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
+		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
+		inv.addItem(new Item("Test", "test", 99, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
+		currItem = inv.getItems().getFirst();
 	}
 	
 	@Override
@@ -39,7 +42,7 @@ public class Player extends GameObject {
 		movePlayer();
 		
 		if(KeyManager.getKey(KeyEvent.VK_R)) {
-			if(canAttack) {
+			if(canAttack && currItem.getType().equals("weapon")) {
 				Game.playerAttack();
 				attacking = true;
 				canAttack = false;
@@ -49,7 +52,22 @@ public class Player extends GameObject {
 			canAttack = true;
 		}
 		
+		if(KeyManager.getKey(KeyEvent.VK_UP)) {
+			if(canSwap) {
+				
+			}
+		} else if(KeyManager.getKey(KeyEvent.VK_DOWN)) {
+			if(canSwap) {
+				
+			}
+		} else {
+			canSwap = true;
+		}
+		
 		currAnim.run();
+		
+		currItem.setX(this.getCenterX());
+		currItem.setY(this.getCenterY());
 		
 		// tile collisions
 		if(!Game.debugMode)

@@ -3,9 +3,11 @@ package com.spellbound.objects;
 import java.awt.Rectangle;
 import java.util.Random;
 
+import com.spellbound.inventory.Item;
 import com.spellbound.tiles.Map;
 import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
+import com.spellbound.utils.ImageLoader;
 import com.spellbound.utils.SpriteHandler;
 
 public abstract class Hostile extends GameObject {
@@ -31,6 +33,7 @@ public abstract class Hostile extends GameObject {
 		this.strikeArea = new Circle(x + width/2, y + height/2, strikeAreaRad);
 		
 		this.r = new Random((long)(x + y));
+		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
 	}
 
 	@Override
@@ -46,6 +49,10 @@ public abstract class Hostile extends GameObject {
 			attack();
 			break;
 		}
+		
+		currItem = inv.getItems().getFirst();
+		currItem.setX(this.getCenterX());
+		currItem.setY(this.getCenterY());
 		
 		this.move();
 		
