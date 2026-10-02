@@ -20,6 +20,8 @@ public class Player extends GameObject {
 	private boolean canRun = true, isRunning = false, canWalk = true, isWalking = false;
 	private boolean canSwap = true;
 	
+	private int currStrikes, maxStrikes = 5, strikeCool = 20;
+	
 	public Player(float x, float y, int width, int height, int strikeAreaRad) {
 		super(x, y, width, height, 0, Colors.blue, Game.TILE_SIZE, strikeAreaRad, 10, 200);
 		this.width = width;
@@ -31,9 +33,11 @@ public class Player extends GameObject {
 		
 		currAnim = SpriteHandler.player_idleD;
 		
-		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
+		inv.addItem(new Item("Test", "weapon", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
 		inv.addItem(new Item("Test", "test", 99, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
+		inv.addItem(new Item("Test", "test", 30, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
 		currItem = inv.getItems().getFirst();
+		currStrikes = 0;
 	}
 	
 	@Override
@@ -41,24 +45,57 @@ public class Player extends GameObject {
 		// player movement
 		movePlayer();
 		
+		// attack
 		if(KeyManager.getKey(KeyEvent.VK_R)) {
 			if(canAttack && currItem.getType().equals("weapon")) {
 				Game.playerAttack();
+				currStrikes++;
+				strikeCool = 20;
 				attacking = true;
 				canAttack = false;
 			}
 		} else {
 			attacking = false;
-			canAttack = true;
+			if(currStrikes < maxStrikes && strikeCool <= 0) {
+				canAttack = true;
+			}
 		}
 		
+		if(strikeCool > 0) {
+			strikeCool--;
+		}
+		
+		if(hurt) {
+			hurtTimer--;
+		}
+		
+		if(hurtTimer <= 0) {
+			hurt= false;
+			hurtTimer = 10;
+		}
+		
+		if(hp <= 0) {
+			dieTimer--;
+		}
+		
+		// inventory slot switching
 		if(KeyManager.getKey(KeyEvent.VK_UP)) {
 			if(canSwap) {
-				
+				inv.setHighlightedSlot(inv.getHighlightedSlot() - 1);
+				// circle back to end of items if past beginning
+				if(inv.getHighlightedSlot() < 0) {
+					inv.setHighlightedSlot(inv.getItems().size() - 1); // set to max in inventory shown
+				}
+				canSwap = false;
 			}
 		} else if(KeyManager.getKey(KeyEvent.VK_DOWN)) {
 			if(canSwap) {
-				
+				inv.setHighlightedSlot(inv.getHighlightedSlot() + 1);
+				// circle back to zero if end of items
+				if(inv.getHighlightedSlot() > inv.getItems().size() - 1) {
+					inv.setHighlightedSlot(0);
+				}
+				canSwap = false;
 			}
 		} else {
 			canSwap = true;
@@ -66,8 +103,11 @@ public class Player extends GameObject {
 		
 		currAnim.run();
 		
+		currItem = inv.getItems().get(inv.getHighlightedSlot());
 		currItem.setX(this.getCenterX());
 		currItem.setY(this.getCenterY());
+		
+		//System.out.println(hp);
 		
 		// tile collisions
 		if(!Game.debugMode)

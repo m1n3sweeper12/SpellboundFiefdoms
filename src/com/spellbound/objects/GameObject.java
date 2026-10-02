@@ -39,7 +39,7 @@ public abstract class GameObject {
 	
 	protected int power;
 	protected boolean canAttack, attacking;
-	protected int hp;
+	protected int hp, maxHp;
 	
 	protected Animation currAnim;
 	
@@ -54,6 +54,9 @@ public abstract class GameObject {
 	
 	protected Inventory inv;
 	protected Item currItem;
+	
+	protected boolean hurt;
+	protected int hurtTimer = 10, dieTimer = 70;
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c, int damageAreaRad, int strikeAreaRad, int power, int hp) {
@@ -78,7 +81,8 @@ public abstract class GameObject {
 		this.attacking = false;
 		// tracks health points
 		this.hp = hp;
-		this.inv = new Inventory(10);
+		this.maxHp = hp;
+		this.inv = new Inventory(8);
 		this.currItem = null;
 	}
 	
@@ -124,6 +128,20 @@ public abstract class GameObject {
 			
 			// draw animation
 			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
+			
+			if(hp < maxHp) {
+				// draw background
+				g.setColor(Colors.black.brighter());
+				g.fillRect(getCenterX() - maxHp/2, (int)y - 20, maxHp + 4, 16);
+				// draw health bar
+				g.setColor(Colors.green);
+				g.fillRect(getCenterX() - maxHp/2 + 2, (int)y - 18, hp, 12);
+			}
+			
+			if(hurt) {
+				g.setColor(Colors.red);
+				g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
+			}
 		}
 	}
 	
@@ -180,12 +198,20 @@ public abstract class GameObject {
 		return bounds.x;
 	}
 	
+	public void setX(float x) {
+		this.x = x;
+	}
+	
 	public int getCenterX() {
 		return bounds.x + bounds.width/2;
 	}
 	
 	public int getY() {
 		return bounds.y;
+	}
+	
+	public void setY(float y) {
+		this.y = y;
 	}
 	
 	public int getCenterY() {
@@ -200,6 +226,10 @@ public abstract class GameObject {
 		return damageArea;
 	}
 	
+	public Rectangle getStrikeArea() {
+		return strikeArea;
+	}
+	
 	public int getHP() {
 		return hp;
 	}
@@ -210,6 +240,7 @@ public abstract class GameObject {
 	
 	public void damage(int amt) {
 		this.hp -= amt;
+		hurt = true;
 	}
 	
 	public void heal(int amt) {
@@ -234,6 +265,10 @@ public abstract class GameObject {
 	
 	public Inventory getInventory() {
 		return inv;
+	}
+	
+	public int getDieTimer() {
+		return dieTimer;
 	}
 	
 }

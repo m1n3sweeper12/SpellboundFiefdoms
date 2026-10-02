@@ -48,6 +48,8 @@ public class Game extends State {
 	// TEMP, for testing 
 	Map test, currentMap;
 	
+	private Inventory UIInv;
+	
 	public Game(Main main) {
 		super(main);
 		
@@ -81,6 +83,8 @@ public class Game extends State {
 		
 		// TEMP
 		System.out.println("Color Key:\nblue -> player\nred -> hostile\ngreen -> passive");
+		
+		UIInv = new Inventory(1);
 	}
 	
 	public static void playerAttack() {
@@ -89,6 +93,29 @@ public class Game extends State {
 			if(attackLine.intersects(o.getDamageArea())) {
 				o.damage(player.getPower());
 			}
+		}
+	}
+	
+	public static void enemyAttack(Hostile enemy) {
+		if(enemy.getState() == MOBSTATES.Attack) {
+			Line2D.Double attackLine = getAttackLine((GameObject)enemy);
+			if(attackLine.intersects(player.getDamageArea())) {
+				player.damage(enemy.getPower());
+				System.out.println("got here");
+			}
+		}
+	}
+	
+	public static void enemyChase(Hostile enemy) {
+		if(enemy.getState() == MOBSTATES.Chase) {
+			if(enemy.getCenterX() > player.getCenterX())
+				enemy.setX(enemy.getX() - enemy.getChaseSpeed());
+			if(enemy.getCenterX() < player.getCenterX())
+				enemy.setX(enemy.getX() + enemy.getChaseSpeed());
+			if(enemy.getCenterY() > player.getCenterY())
+				enemy.setY(enemy.getY() - enemy.getChaseSpeed());
+			if(enemy.getCenterY() < player.getCenterY())
+				enemy.setY(enemy.getY() + enemy.getChaseSpeed());
 		}
 	}
 	
@@ -135,6 +162,13 @@ public class Game extends State {
 		return l;
 	}
 	
+	private void updateUIInv() {
+		UIInv = new Inventory(player.getInventory().getSlots());
+		for(int i = 0; i < player.getInventory().getItems().size(); i++) {
+			UIInv.addItem(player.getInventory().getItems().get(i), i);
+		}
+	}
+	
 	private void sortObjects() {
 		// layer objects by ascending y position
 		objects.sort(Comparator.comparing(GameObject::getY));
@@ -159,8 +193,20 @@ public class Game extends State {
 		
 		// make enemies chase player
 		for(Hostile h : enemies) {
+			if(h.getBounds().intersects(player.getBounds())) {
+				h.setState(MOBSTATES.Attack);
+			}
+			
+			if(h.getStrikeArea().intersects(player.getStrikeArea())) {
+				h.setPlayerSeen(true);
+			} else {
+				h.setPlayerSeen(false);
+			}
+			
 			if(h.isPlayerSeen()) {
 				h.setState(MOBSTATES.Chase);
+			} else {
+				h.setState(MOBSTATES.Roam);
 			}
 		}
 		
@@ -173,11 +219,13 @@ public class Game extends State {
 		}
 		
 		// remove objects if health reaches 0
-		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0);
-		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0);
-		objects.removeIf(ob -> ob.getHP() <= 0);
+		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0 && ob.getDieTimer() <= 0);
+		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0 && ob.getDieTimer() <= 0);
+		objects.removeIf(ob -> ob.getHP() <= 0 && ob.getDieTimer() <= 0);
 		
 		sortObjects();
+		
+		updateUIInv();
 		
 		// TEMP, for debugging
 		if(KeyManager.getKey(KeyEvent.VK_X) && debugToggle) {
@@ -211,9 +259,11 @@ public class Game extends State {
 		// render objects
 		for(GameObject o : objects) {
 			o.render(g);
+			if(debugMode) {
+				g.setColor(Colors.white);
+				g.draw(Game.getAttackLine(o));
+			}
 		}
-		
-		// DEBUG MODE
 		
 		g.translate(cam.getX(), cam.getY());
 		
@@ -238,9 +288,27 @@ public class Game extends State {
 		g.setColor(Colors.black);
 		g.drawRect(150, 10, 200, 20);
 		
+		// render player health bar
+		g.setColor(Colors.white);
+		g.setFont(new Font("Monospaced", Font.PLAIN, 18));
+		g.drawString("Health:", 10, 75);
+		g.setColor(Colors.white.darker().darker());
+		g.fillRect(150, 60, 200, 20);
+		if(player.getHP() < 50) {
+			g.setColor(Colors.red);
+		} else if(player.getHP() < 100) {
+			g.setColor(Colors.orange);
+		} else if(player.getHP() < 150) {
+			g.setColor(Colors.yellow);
+		} else {
+			g.setColor(Colors.green);
+		}
+		g.fillRect(150, 60, (int)player.getHP(), 20);
+		g.setColor(Colors.black);
+		g.drawRect(150, 60, 200, 20);
+		
 		// render player inventory
-		Inventory UIInv = new Inventory(player.getInventory());
-		UIInv.render(g);
+		player.getInventory().render(g);
 		
 		// DEBUG MODE
 		if(debugMode) {

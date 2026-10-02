@@ -120,6 +120,7 @@ public class SpriteHandler {
 		BufferedImage enemy_idle = ImageLoader.loadImage("res/sprites/enemy/barbarian-idle.png");
 		BufferedImage enemy_walk = ImageLoader.loadImage("res/sprites/enemy/barbarian-walk.png");
 		BufferedImage enemy_run = ImageLoader.loadImage("res/sprites/enemy/barbarian-run.png");
+		BufferedImage enemy_die = ImageLoader.loadImage("res/sprites/enemy/barbarian-die.png");
 		
 		// ENEMY IDLE //
 		enemy_idleR = new Animation(6, enemy_idle.getSubimage(0*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
@@ -166,30 +167,72 @@ public class SpriteHandler {
 										enemy_walk.getSubimage(5*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
 						
 		// ENEMY RUN //
-		enemy_runR = new Animation(8,	enemy_run.getSubimage(0*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+		enemy_runR = new Animation(6,	enemy_run.getSubimage(0*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(1*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(2*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(3*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(4*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(5*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-		enemy_runU = new Animation(8,	enemy_run.getSubimage(0*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+		enemy_runU = new Animation(6,	enemy_run.getSubimage(0*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(1*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(2*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(3*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(4*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(5*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-		enemy_runL = new Animation(8,	enemy_run.getSubimage(0*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+		enemy_runL = new Animation(6,	enemy_run.getSubimage(0*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(1*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(2*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(3*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(4*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(5*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-		enemy_runD = new Animation(8,	enemy_run.getSubimage(0*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+		enemy_runD = new Animation(6,	enemy_run.getSubimage(0*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(1*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(2*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(3*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(4*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
 										enemy_run.getSubimage(5*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+		
+		// ENEMY DIE //
+		enemy_dieR = new Animation(8,	enemy_die.getSubimage(0*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(1*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(2*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(3*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(4*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(5*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(6*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(7*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(8*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(9*SPRITE_SIZE, 0*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+		enemy_dieU = new Animation(8,	enemy_die.getSubimage(0*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(1*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(2*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(3*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(4*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(5*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(6*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(7*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(8*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(9*SPRITE_SIZE, 1*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+		enemy_dieL = new Animation(8,	enemy_die.getSubimage(0*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(1*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(2*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(3*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(4*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(5*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(6*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(7*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(8*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(9*SPRITE_SIZE, 2*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+		enemy_dieD = new Animation(8,	enemy_die.getSubimage(0*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(1*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(2*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(3*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(4*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(5*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(6*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(7*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(8*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE),
+										enemy_die.getSubimage(9*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
 		
 		/////////////////
 		///   TILES   ///

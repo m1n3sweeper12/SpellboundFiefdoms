@@ -66,4 +66,8 @@ public class Item {
 		this.type = type;
 	}
 	
+	public BufferedImage getImage() {
+		return img;
+	}
+	
 }

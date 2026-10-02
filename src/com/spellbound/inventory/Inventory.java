@@ -19,12 +19,6 @@ public class Inventory {
 		highSlot = 0;
 	}
 	
-	public Inventory(Inventory i) {
-		this.slots = i.getSlots();
-		this.items = i.getItems();
-		highSlot = 0;
-	}
-	
 	public void addItem(Item item, int slot) {
 		items.add(slot, item);
 	}
@@ -43,28 +37,27 @@ public class Inventory {
 	public void render(Graphics2D g) {
 		// draw background
 		g.setColor(Colors.black.brighter());
-		g.fillRect(15, 100, 68, 68*5);
+		g.fillRect(15, 100, 68, 68*8);
 		
 		// draw boxes
 		
-		g.fillRect(15+2, 100+2+68*1, 64, 64);
-		g.fillRect(15+2, 100+2+68*2, 64, 64);
-		g.fillRect(15+2, 100+2+68*3, 64, 64);
-		g.fillRect(15+2, 100+2+68*4, 64, 64);
+		for(int i = 0; i < 8; i++) {
+			g.fillRect(15+2, 100+2+68*i, 64, 64);
+		}
 		
 		// draw items
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < 8; i++) {
 			g.setColor(Colors.blue.brighter().brighter());
 			g.fillRect(15+2, 100+2+68*i, 64, 64);
 			if(items.size() > i) {
 				Item item = items.get(i);
-				item.setX(15+2+16);
-				item.setY(100+2+68*i+16);
-				item.render(g);
-				if(item.getQuantity() > 1) {
+				Item newItem = new Item(item.getName(), item.getType(), item.getQuantity(),
+						15+2+16, 100+2+68*i+16, item.getImage());
+				newItem.render(g);
+				if(newItem.getQuantity() > 1) {
 					g.setColor(Colors.black);
 					g.setFont(new Font("Sansserif", Font.BOLD, 16));
-					g.drawString(item.getQuantity() + "", 15+16+32, 100+2+68*i+16+4);
+					g.drawString(newItem.getQuantity() + "", 15+16+32, 100+2+68*i+16+4);
 				}
 			}
 		}
@@ -85,6 +78,10 @@ public class Inventory {
 	
 	public int getHighlightedSlot() {
 		return highSlot;
+	}
+	
+	public void setHighlightedSlot(int highSlot) {
+		this.highSlot = highSlot;
 	}
 	
 }
