@@ -3,6 +3,7 @@ package com.spellbound.objects;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.HashMap;
 
 import com.spellbound.inventory.Inventory;
 import com.spellbound.inventory.Item;
@@ -29,19 +30,13 @@ public abstract class GameObject {
 	protected int direction;
 	// direction list:
 	// 0 -> east
-	// 1 -> south east
-	// 2 -> south
-	// 3 -> south west
-	// 4 -> west
-	// 5 -> north west
-	// 6 -> north
-	// 7 -> north east
+	// 1 -> south
+	// 2 -> west
+	// 3 -> north
 	
 	protected int power;
 	protected boolean canAttack, attacking;
 	protected int hp, maxHp;
-	
-	protected Animation currAnim;
 	
 	protected int id; // used to track object types for collisions
 	// id list:
@@ -57,6 +52,9 @@ public abstract class GameObject {
 	
 	protected boolean hurt;
 	protected int hurtTimer = 10, dieTimer = 70;
+	
+	protected HashMap<String, Animation> animations = new HashMap<>();
+	protected Animation currAnim;
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c, int damageAreaRad, int strikeAreaRad, int power, int hp) {
@@ -87,6 +85,7 @@ public abstract class GameObject {
 	}
 	
 	public abstract void tick(Map m);
+	protected abstract void setDirection();
 	
 	public void render(Graphics2D g) {
 		
@@ -162,8 +161,12 @@ public abstract class GameObject {
 		this.strikeArea.y = (int)this.getCenterY() - strikeArea.height/2;
 	}
 	
+	protected void setAnimations(HashMap<String, Animation> animations) {
+		this.animations = animations;
+		this.currAnim = animations.get("idle-down");
+	}
+	
 	protected void tileCollide(Map m) {
-		
 		for(Tile t : m.getTiles()) {
 			if(topBounds.intersects(t.getBounds()) && t.isSolid()) {
 				this.y = t.getBounds().y + Game.TILE_SIZE;

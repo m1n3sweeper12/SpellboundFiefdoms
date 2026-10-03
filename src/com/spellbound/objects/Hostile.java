@@ -36,6 +36,8 @@ public abstract class Hostile extends GameObject {
 		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
 	}
 
+	
+	
 	@Override
 	public void tick(Map m) {
 		switch(state) {
@@ -107,7 +109,7 @@ public abstract class Hostile extends GameObject {
 		}
 	}
 	
-	private void setDirection() {
+	protected void setDirection() {
 		if(xDir > 0) direction = 0;
 		else if(xDir < 0) direction = 4;
 		else if(yDir > 0) direction = 2;
