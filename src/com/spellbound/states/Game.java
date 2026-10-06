@@ -101,7 +101,6 @@ public class Game extends State {
 			Line2D.Double attackLine = getAttackLine((GameObject)enemy);
 			if(attackLine.intersects(player.getDamageArea())) {
 				player.damage(enemy.getPower());
-				System.out.println("got here");
 			}
 		}
 	}
@@ -127,33 +126,17 @@ public class Game extends State {
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY());
 			break;
-		case 1: // south east
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() + o.getStrikeDist()), (double)(o.getCenterY() + o.getStrikeDist()));
-			break;
-		case 2: // south
+		case 1: // south
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX()), (double)o.getCenterY() + o.getStrikeDist());
 			break;
-		case 3: // south west
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() + o.getStrikeDist());
-			break;
-		case 4: // west
+		case 2: // west
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY());
 			break;
-		case 5: // north west
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
-			break;
-		case 6: // north
+		case 3: // north
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX()), (double)o.getCenterY() - o.getStrikeDist());
-			break;
-		case 7: // north east
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
 			break;
 		default:
 			l = new Line2D.Double();

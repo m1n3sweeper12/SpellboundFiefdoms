@@ -110,10 +110,10 @@ public abstract class Hostile extends GameObject {
 	}
 	
 	protected void setDirection() {
-		if(xDir > 0) direction = 0;
-		else if(xDir < 0) direction = 4;
-		else if(yDir > 0) direction = 2;
-		else if(yDir < 0) direction = 6;
+		if(xDir > 0) direction = 0; // east
+		else if(xDir < 0) direction = 2; // west
+		else if(yDir > 0) direction = 1; // south
+		else if(yDir < 0) direction = 3; // north
 	}
 	
 	public void roam() {
@@ -160,11 +160,11 @@ public abstract class Hostile extends GameObject {
 		switch(direction) {
 		case 0: // east
 			currAnim = SpriteHandler.enemy_dieR;
-		case 2: // south
+		case 1: // south
 			currAnim = SpriteHandler.enemy_dieD;
-		case 4: // west
+		case 2: // west
 			currAnim = SpriteHandler.enemy_dieL;
-		case 6: // north
+		case 3: // north
 			currAnim = SpriteHandler.enemy_dieU;
 			break;
 		}
