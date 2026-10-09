@@ -119,6 +119,10 @@ public class Player extends GameObject {
 		currItem = inv.getItems().get(inv.getHighlightedSlot());
 		currItem.setX(this.getCenterX());
 		currItem.setY(this.getCenterY());
+		switch(direction) {
+		case 0:
+			
+		}
 	}
 	
 	private void attack() {
