@@ -100,22 +100,39 @@ public class Game extends State {
 		if(enemy.getState() == MOBSTATES.Attack) {
 			Line2D.Double attackLine = getAttackLine((GameObject)enemy);
 			if(attackLine.intersects(player.getDamageArea())) {
-				player.damage(enemy.getPower());
+				if(enemy.getStrikeCool() <= 0) {
+					player.damage(enemy.getPower());
+					enemy.setStrikeCool(100);
+				} else {
+					enemy.setStrikeCool(enemy.getStrikeCool() - 1);
+				}
 			}
+			
+			enemy.setState(MOBSTATES.Chase);
 		}
 	}
 	
 	public static void enemyChase(Hostile enemy) {
 		if(enemy.getState() == MOBSTATES.Chase) {
-			if(enemy.getCenterX() > player.getCenterX())
+			if(enemy.getCenterX() > player.getCenterX()) {
 				enemy.setX(enemy.getX() - enemy.getChaseSpeed());
-			if(enemy.getCenterX() < player.getCenterX())
+				enemy.setXDir(-1);
+			}
+			if(enemy.getCenterX() < player.getCenterX()) {
 				enemy.setX(enemy.getX() + enemy.getChaseSpeed());
-			if(enemy.getCenterY() > player.getCenterY())
+				enemy.setXDir(1);
+			}
+			if(enemy.getCenterY() > player.getCenterY()) {
 				enemy.setY(enemy.getY() - enemy.getChaseSpeed());
-			if(enemy.getCenterY() < player.getCenterY())
+				enemy.setYDir(-1);
+			}
+			if(enemy.getCenterY() < player.getCenterY()) {
 				enemy.setY(enemy.getY() + enemy.getChaseSpeed());
+				enemy.setYDir(1);
+			}
 		}
+		
+		enemy.setDirection();
 	}
 	
 	private static Line2D.Double getAttackLine(GameObject o) {
@@ -165,33 +182,10 @@ public class Game extends State {
 		}
 		
 		// only tick tiles that are visible on screen
-		for(Tile t : currentMap.getTiles()) {
-			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
-					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
-					&& t.getBounds().y > (player.getY() - Game.SCREEN_HEIGHT)
-					&& t.getBounds().y < (player.getY() + Game.SCREEN_HEIGHT)) {
-				t.tick();
-			}
-		}
+		tickTiles();
 		
 		// make enemies chase player
-		for(Hostile h : enemies) {
-			if(h.getBounds().intersects(player.getBounds())) {
-				h.setState(MOBSTATES.Attack);
-			}
-			
-			if(h.getStrikeArea().intersects(player.getStrikeArea())) {
-				h.setPlayerSeen(true);
-			} else {
-				h.setPlayerSeen(false);
-			}
-			
-			if(h.isPlayerSeen()) {
-				h.setState(MOBSTATES.Chase);
-			} else {
-				h.setState(MOBSTATES.Roam);
-			}
-		}
+		setMobStates();
 		
 		// tick camera
 		cam.tick(player);
@@ -227,9 +221,58 @@ public class Game extends State {
 		g.setColor(Colors.black);
 		g.fillRect(0, 0, main.getWidth(), main.getHeight());
 		
+		// render tiles and objects within camera view
 		g.translate(-cam.getX(), -cam.getY());
 		
 		// only render tiles that are visible on screen
+		renderTiles(g);
+		
+		// render objects
+		renderObjects(g);
+		
+		g.translate(cam.getX(), cam.getY());
+		
+		// renders UI over camera view
+		renderUI(g);
+	}
+	
+	// ***TICK METHODS*** //
+	
+	private void tickTiles() {
+		for(Tile t : currentMap.getTiles()) {
+			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
+					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
+					&& t.getBounds().y > (player.getY() - Game.SCREEN_HEIGHT)
+					&& t.getBounds().y < (player.getY() + Game.SCREEN_HEIGHT)) {
+				t.tick();
+			}
+		}
+	}
+	
+	private void setMobStates() {
+		for(Hostile h : enemies) {
+			if(h.getBounds().intersects(player.getBounds())) {
+				h.setState(MOBSTATES.Attack);
+			}
+			
+			if(h.getStrikeArea().intersects(player.getStrikeArea())) {
+				h.setPlayerSeen(true);
+			} else {
+				h.setPlayerSeen(false);
+			}
+			
+			if(h.isPlayerSeen()) {
+				if(h.getState() != MOBSTATES.Attack)
+					h.setState(MOBSTATES.Chase);
+			} else {
+				h.setState(MOBSTATES.Roam);
+			}
+		}
+	}
+	
+	// ***RENDER METHODS*** //
+	
+	private void renderTiles(Graphics2D g) {
 		for(Tile t : currentMap.getTiles()) {
 			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
 					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
@@ -238,8 +281,9 @@ public class Game extends State {
 				t.render(g);
 			}
 		}
-		
-		// render objects
+	}
+	
+	private void renderObjects(Graphics2D g) {
 		for(GameObject o : objects) {
 			o.render(g);
 			if(debugMode) {
@@ -247,11 +291,9 @@ public class Game extends State {
 				g.draw(Game.getAttackLine(o));
 			}
 		}
-		
-		g.translate(cam.getX(), cam.getY());
-		
-		// *** GUI ***
-		
+	}
+	
+	private void renderUI(Graphics2D g) {
 		// render player stamina bar
 		g.setColor(Colors.white);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 18));
@@ -272,6 +314,7 @@ public class Game extends State {
 		g.drawRect(150, 10, 200, 20);
 		
 		// render player health bar
+		/*
 		g.setColor(Colors.white);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 18));
 		g.drawString("Health:", 10, 75);
@@ -289,6 +332,7 @@ public class Game extends State {
 		g.fillRect(150, 60, (int)player.getHP(), 20);
 		g.setColor(Colors.black);
 		g.drawRect(150, 60, 200, 20);
+		*/
 		
 		// render player inventory
 		player.getInventory().render(g);

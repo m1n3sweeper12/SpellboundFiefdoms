@@ -12,18 +12,23 @@ import com.spellbound.utils.SpriteHandler;
 
 public abstract class Hostile extends GameObject {
 	
-	protected boolean playerSeen;
-	protected MOBSTATES state;
+	// state variables
+	protected boolean playerSeen; // if player is seen, sets to chase state
+	protected MOBSTATES state; // tracks current state of mobs
 	
 	// roaming variables
 	protected Rectangle roamArea; // tracks area in which hostile can roam
 	private int moveTimer, roamSpeed;	// moveTimer randomly selects time between movements
 										// roamSpeed tracks hostile speed while roaming
 										// chaseSpeed tracks hostile speed while chasing
-	private int xDir, yDir, xDist, yDist; // Dir tracks direction of movement, dist tracks distance of movement
+	// movement variables
+	// Dir tracks direction of movement, Dist tracks distance of movement
+	private int xDir, yDir, xDist, yDist;
+	private boolean canMove = true;
 	
-	private Random r;
-	private float chaseSpeed;
+	private Random r; // for random roaming directions
+	private float chaseSpeed; // tracks speed while chasing player
+	private int strikeCool = 0; // tracks enemy attack cooldown
 	
 	public Hostile(float x, float y, int width, int height, int moveDist, int roamSpeed, int damageAreaRad, int strikeAreaRad, int power, int hp) {
 		super(x, y, width, height, 1, Colors.red, damageAreaRad, strikeAreaRad, power, hp);
@@ -35,11 +40,37 @@ public abstract class Hostile extends GameObject {
 		this.r = new Random((long)(x + y));
 		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
 	}
-
-	
 	
 	@Override
 	public void tick(Map m) {
+		checkState();
+		
+		checkHealth();
+		
+		trackItem();
+		
+		if(canMove)
+			move();
+		
+		setAnimation();
+		setDirection();
+		
+		tileCollide(m);
+	}
+	
+	private void checkHealth() {
+		if(hp <= 0) {
+			dieTimer--;
+			state = MOBSTATES.Die;
+			canMove = false;
+		}
+		
+		if(hurt) {
+			hurt();
+		}
+	}
+	
+	private void checkState() {
 		switch(state) {
 		case Roam:
 			roam();
@@ -54,32 +85,20 @@ public abstract class Hostile extends GameObject {
 			die();
 			break;
 		}
-		
-		if(hp <= 0) {
-			dieTimer--;
-			state = MOBSTATES.Die;
-		}
-		
-		if(hurt) {
-			hurtTimer--;
-		}
+	}
+	
+	private void hurt() {
+		hurtTimer--;
 		
 		if(hurtTimer <= 0) {
 			hurt = false;
 		}
-		
+	}
+	
+	private void trackItem() {
 		currItem = inv.getItems().getFirst();
 		currItem.setX(this.getCenterX());
 		currItem.setY(this.getCenterY());
-		
-		this.move();
-		
-		this.setAnimation();
-		this.setDirection();
-		
-		currAnim.run();
-		
-		this.tileCollide(m);
 	}
 	
 	private void setAnimation() {
@@ -107,9 +126,11 @@ public abstract class Hostile extends GameObject {
 			else if(yDir > 0) currAnim = SpriteHandler.enemy_runD;
 			else if(yDir < 0) currAnim = SpriteHandler.enemy_runU;
 		}
+		
+		currAnim.run();
 	}
 	
-	protected void setDirection() {
+	public void setDirection() {
 		if(xDir > 0) direction = 0; // east
 		else if(xDir < 0) direction = 2; // west
 		else if(yDir > 0) direction = 1; // south
@@ -188,6 +209,22 @@ public abstract class Hostile extends GameObject {
 	
 	public float getChaseSpeed() {
 		return chaseSpeed;
+	}
+	
+	public int getStrikeCool() {
+		return strikeCool;
+	}
+	
+	public void setStrikeCool(int strikeCool) {
+		this.strikeCool = strikeCool;
+	}
+	
+	public void setXDir(int xDir) {
+		this.xDir = xDir;
+	}
+	
+	public void setYDir(int yDir) {
+		this.yDir = yDir;
 	}
 
 }

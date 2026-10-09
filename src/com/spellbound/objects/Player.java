@@ -1,6 +1,7 @@
 package com.spellbound.objects;
 
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 import com.spellbound.inventory.Item;
@@ -14,11 +15,14 @@ import com.spellbound.utils.SpriteHandler;
 
 public class Player extends GameObject {
 	
+	// movement variables
 	private int speed, walkSpeed, runSpeed;
 	private double runStamina = 200, maxRun = 200, minRun = 100;
 	private boolean canRun = true, isRunning = false, canWalk = true, isWalking = false;
-	private boolean canSwap = true;
 	
+	private boolean canSwap = true; // tracks if inventory swapping can happen
+	
+	// attack variables
 	private int currStrikes, maxStrikes = 5, strikeCool = 20;
 	
 	public Player(float x, float y, int width, int height, int strikeAreaRad) {
@@ -28,7 +32,7 @@ public class Player extends GameObject {
 		this.runSpeed = 4;
 		this.direction = 0;
 		
-		inv.addItem(new Item("Test", "weapon", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
+		inv.addItem(new Item("Test", "weapon", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/sword-temp.png")), 0);
 		inv.addItem(new Item("Test", "test", 99, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
 		inv.addItem(new Item("Test", "test", 30, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 1);
 		currItem = inv.getItems().getFirst();
@@ -42,26 +46,28 @@ public class Player extends GameObject {
 		// player movement
 		movePlayer();
 		
-		// attack
-		if(KeyManager.getKey(KeyEvent.VK_R)) {
-			if(canAttack && currItem.getType().equals("weapon")) {
-				Game.playerAttack();
-				currStrikes++;
-				strikeCool = 20;
-				attacking = true;
-				canAttack = false;
-			}
-		} else {
-			attacking = false;
-			if(currStrikes < maxStrikes && strikeCool <= 0) {
-				canAttack = true;
-			}
-		}
+		// player attack
+		attack();
 		
-		if(strikeCool > 0) {
-			strikeCool--;
-		}
+		// hurt player if attacked
+		hurt();
 		
+		// automatic player healing over time
+		heal();
+		
+		// inventory slot switching
+		switchInventorySlot();
+		
+		trackItem();
+		
+		//System.out.println(hp);
+		
+		// tile collisions
+		if(!Game.debugMode)
+			tileCollide(m);
+	}
+	
+	private void hurt() {
 		if(hurt) {
 			hurtTimer--;
 		}
@@ -74,8 +80,18 @@ public class Player extends GameObject {
 		if(hp <= 0) {
 			dieTimer--;
 		}
-		
-		// inventory slot switching
+	}
+	
+	private void heal() {
+		if(healTimer <= 0 && hp < maxHp) {
+			hp += 2;
+			healTimer = 100;
+		} else {
+			healTimer--;
+		}
+	}
+	
+	private void switchInventorySlot() {
 		if(KeyManager.getKey(KeyEvent.VK_UP)) {
 			if(canSwap) {
 				inv.setHighlightedSlot(inv.getHighlightedSlot() - 1);
@@ -97,18 +113,33 @@ public class Player extends GameObject {
 		} else {
 			canSwap = true;
 		}
-		
-		currAnim.run();
-		
+	}
+	
+	private void trackItem() {
 		currItem = inv.getItems().get(inv.getHighlightedSlot());
 		currItem.setX(this.getCenterX());
 		currItem.setY(this.getCenterY());
+	}
+	
+	private void attack() {
+		if(KeyManager.getKey(KeyEvent.VK_R)) {
+			if(canAttack && currItem.getType().equals("weapon")) {
+				Game.playerAttack();
+				currStrikes++;
+				strikeCool = 20;
+				attacking = true;
+				canAttack = false;
+			}
+		} else {
+			attacking = false;
+			if(currStrikes < maxStrikes && strikeCool <= 0) {
+				canAttack = true;
+			}
+		}
 		
-		//System.out.println(hp);
-		
-		// tile collisions
-		if(!Game.debugMode)
-			tileCollide(m);
+		if(strikeCool > 0) {
+			strikeCool--;
+		}
 	}
 	
 	private void movePlayer() {
@@ -223,6 +254,8 @@ public class Player extends GameObject {
 				currAnim = SpriteHandler.player_idleU;
 			break;
 		}
+		
+		currAnim.run();
 	}
 	
 	@Override

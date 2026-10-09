@@ -33,6 +33,10 @@ public class Animation {
 		return frames[index];
 	}
 	
+	public void setCurrentFrame(BufferedImage img) {
+		frames[index] = img;
+	}
+	
 	public void setIndex(int index) {
 		this.index = index;
 	}

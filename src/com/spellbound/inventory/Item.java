@@ -70,4 +70,8 @@ public class Item {
 		return img;
 	}
 	
+	public void setImage(BufferedImage img) {
+		this.img = img;
+	}
+	
 }

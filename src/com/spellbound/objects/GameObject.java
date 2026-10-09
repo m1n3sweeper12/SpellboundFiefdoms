@@ -51,7 +51,7 @@ public abstract class GameObject {
 	protected Item currItem;
 	
 	protected boolean hurt;
-	protected int hurtTimer = 10, dieTimer = 70;
+	protected int hurtTimer = 10, dieTimer = 70, healTimer = 100;
 	
 	protected HashMap<String, Animation> animations = new HashMap<>();
 	protected Animation currAnim;
@@ -139,7 +139,7 @@ public abstract class GameObject {
 			
 			if(hurt) {
 				g.setColor(Colors.red);
-				g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
+				g.fillOval(bounds.x + bounds.width/4, bounds.y, bounds.width/2, bounds.height);
 			}
 		}
 	}
