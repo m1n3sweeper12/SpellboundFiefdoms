@@ -71,8 +71,8 @@ public class Game extends State {
 		
 		// TEMP, will be handled using implemented file system
 		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE + 10);
-		objects.add(player);
 		player.readPlayer("res/properties/playerproperties.txt");
+		objects.add(player);
 		
 		e = new EnemyTest(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(e);

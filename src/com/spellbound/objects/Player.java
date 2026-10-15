@@ -51,10 +51,13 @@ public class Player extends GameObject {
 			e.printStackTrace();
 		}
 		
+		System.out.println(s);
+		
 		this.setX(Float.parseFloat(s.substring(0, s.indexOf(" "))));
-		s = s.substring(s.indexOf(" "));
+		s = s.substring(s.indexOf(" ") + 1);
 		this.setY(Float.parseFloat(s.substring(0, s.indexOf(" "))));
-		s = s.substring(s.indexOf(" "));
+		s = s.substring(s.indexOf(" ") + 1);
+		System.out.println(this.getX() + " | " + this.getY());
 	}
 	
 	public void writePlayer(String filepath) {
@@ -62,6 +65,7 @@ public class Player extends GameObject {
 		
 		try {
 			Files.writeString(Path.of(filepath), s);
+			System.out.println("Player properties written to file successfully.");
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
