@@ -44,6 +44,7 @@ public abstract class Hostile extends GameObject {
 	@Override
 	public void tick(Map m) {
 		checkState();
+		tickState();
 		
 		checkHealth();
 		
@@ -70,20 +71,30 @@ public abstract class Hostile extends GameObject {
 		}
 	}
 	
-	private void checkState() {
+	private void tickState() {
 		switch(state) {
-		case Roam:
-			roam();
-			break;
-		case Chase:
-			chase();
-			break;
 		case Attack:
 			attack();
-			break;
 		case Die:
 			die();
-			break;
+		case Chase:
+			chase();
+		case Roam:
+			roam();
+		}
+	}
+	
+	private void checkState() {
+		// if not attacking, either chase, roam, or die
+		if(state != MOBSTATES.Attack) {
+			// run die method if dying
+			if(state != MOBSTATES.Die) {
+				if(playerSeen) {
+					state = MOBSTATES.Chase;
+				} else {
+					state = MOBSTATES.Roam;
+				}
+			}
 		}
 	}
 	

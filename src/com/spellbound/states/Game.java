@@ -1,5 +1,6 @@
 package com.spellbound.states;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -21,6 +22,7 @@ import com.spellbound.tiles.Tile;
 import com.spellbound.utils.Colors;
 import com.spellbound.utils.KeyManager;
 import com.spellbound.utils.SpriteHandler;
+import com.spellbound.utils.Time;
 
 public class Game extends State {
 	
@@ -85,6 +87,8 @@ public class Game extends State {
 		System.out.println("Color Key:\nblue -> player\nred -> hostile\ngreen -> passive");
 		
 		UIInv = new Inventory(1);
+		
+		Time.getTime("res/properties/time.txt");
 	}
 	
 	public static void playerAttack() {
@@ -176,6 +180,8 @@ public class Game extends State {
 	
 	@Override
 	public void tick() {
+		Time.tick();
+		
 		// infinite running in debug mode
 		if(debugMode) {
 			player.setRunStamina(200);
@@ -184,8 +190,8 @@ public class Game extends State {
 		// only tick tiles that are visible on screen
 		tickTiles();
 		
-		// make enemies chase player
-		setMobStates();
+		// controls player/enemy sight handling
+		setHostileSight();
 		
 		// tick camera
 		cam.tick(player);
@@ -232,6 +238,14 @@ public class Game extends State {
 		
 		g.translate(cam.getX(), cam.getY());
 		
+		// NIGHT MODE
+		if(Time.time != null) {
+			if(Time.time.equals("night") || Time.time.equals("early morning")) {
+				g.setColor(new Color(Colors.blue.getRed(), Colors.blue.getGreen(), Colors.blue.getBlue(), 100));
+				g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			}
+		}
+		
 		// renders UI over camera view
 		renderUI(g);
 	}
@@ -249,7 +263,7 @@ public class Game extends State {
 		}
 	}
 	
-	private void setMobStates() {
+	private void setHostileSight() {
 		for(Hostile h : enemies) {
 			if(h.getBounds().intersects(player.getBounds())) {
 				h.setState(MOBSTATES.Attack);
@@ -259,13 +273,6 @@ public class Game extends State {
 				h.setPlayerSeen(true);
 			} else {
 				h.setPlayerSeen(false);
-			}
-			
-			if(h.isPlayerSeen()) {
-				if(h.getState() != MOBSTATES.Attack)
-					h.setState(MOBSTATES.Chase);
-			} else {
-				h.setState(MOBSTATES.Roam);
 			}
 		}
 	}
@@ -336,6 +343,16 @@ public class Game extends State {
 		
 		// render player inventory
 		player.getInventory().render(g);
+		
+		// render time of day and day count
+		g.setFont(new Font("Monospaced", Font.BOLD, 14));
+		g.setColor(Colors.white);
+		g.fillRect(SCREEN_WIDTH - 255, 10, 240, 75);
+		g.setColor(Colors.black);
+		g.drawRect(SCREEN_WIDTH - 255, 10, 240, 75);
+		g.drawString("Day " + Time.day, SCREEN_WIDTH - 250, 25);
+		g.drawString(Time.hour + ":" + String.format("%02d", Time.minute), SCREEN_WIDTH - 250, 50);
+		g.drawString("Time of Day: " + Time.time, SCREEN_WIDTH - 250, 75);
 		
 		// DEBUG MODE
 		if(debugMode) {
