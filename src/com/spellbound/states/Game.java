@@ -72,6 +72,7 @@ public class Game extends State {
 		// TEMP, will be handled using implemented file system
 		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE + 10);
 		objects.add(player);
+		player.readPlayer("res/properties/playerproperties.txt");
 		
 		e = new EnemyTest(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
 		objects.add(e);
@@ -89,6 +90,11 @@ public class Game extends State {
 		UIInv = new Inventory(1);
 		
 		Time.getTime("res/properties/time.txt");
+	}
+	
+	public static void save() {
+		Time.setTime("res/properties/time.txt");
+		player.writePlayer("res/properties/playerproperties.txt");
 	}
 	
 	public static void playerAttack() {

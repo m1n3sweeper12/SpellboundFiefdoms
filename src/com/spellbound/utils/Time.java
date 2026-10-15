@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.spellbound.states.Game;
+
 public class Time {
 	
 	public static int day;
@@ -70,8 +72,9 @@ public class Time {
 		if(hour >= 24) {
 			day++;
 			hour = 0;
-			if(day % 5 == 0) // autosaves every 5 in-game days
-				setTime("res/properties/time.txt");
+			if(day % 5 == 0) {// autosaves every 5 in-game days
+				Game.save();
+			}
 		}
 		
 		switch(hour) {

@@ -2,6 +2,9 @@ package com.spellbound.objects;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 import com.spellbound.inventory.Item;
@@ -38,7 +41,30 @@ public class Player extends GameObject {
 		currItem = inv.getItems().getFirst();
 		currStrikes = 0;
 		loadAnimations();
+	}
+	
+	public void readPlayer(String filepath) {
+		String s = "";
+		try {
+			s = Files.readString(Path.of(filepath));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		
+		this.setX(Float.parseFloat(s.substring(0, s.indexOf(" "))));
+		s = s.substring(s.indexOf(" "));
+		this.setY(Float.parseFloat(s.substring(0, s.indexOf(" "))));
+		s = s.substring(s.indexOf(" "));
+	}
+	
+	public void writePlayer(String filepath) {
+		String s = this.getX() + " " + this.getY() + " ";
+		
+		try {
+			Files.writeString(Path.of(filepath), s);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
