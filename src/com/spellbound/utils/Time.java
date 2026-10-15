@@ -25,8 +25,6 @@ public class Time {
 	public static void getTime(String filepath) {
 		String timeString = "";
 		try {
-			Path path = Path.of(filepath);
-			
 			timeString = Files.readString(Path.of(filepath));
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -41,6 +39,18 @@ public class Time {
 		second = Integer.parseInt(timeString.substring(0, timeString.indexOf(" ")));
 		timeString = timeString.substring(timeString.indexOf(" ") + 1);
 		timer = Integer.parseInt(timeString);
+	}
+	
+	public static void setTime(String filepath) {
+		try {
+			
+			String timeString = day + " " + hour + " " + minute + " " + second + " " + timer;
+			
+			Files.writeString(Path.of(filepath), timeString);
+			System.out.println("Time written to file successfully.");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void tick() {
