@@ -70,6 +70,8 @@ public class Time {
 		if(hour >= 24) {
 			day++;
 			hour = 0;
+			if(day % 5 == 0) // autosaves every 5 in-game days
+				setTime("res/properties/time.txt");
 		}
 		
 		switch(hour) {
