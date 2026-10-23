@@ -3,7 +3,10 @@ package com.spellbound.objects;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.HashMap;
 
+import com.spellbound.inventory.Inventory;
+import com.spellbound.inventory.Item;
 import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
 import com.spellbound.tiles.Tile;
@@ -27,29 +30,31 @@ public abstract class GameObject {
 	protected int direction;
 	// direction list:
 	// 0 -> east
-	// 1 -> south east
-	// 2 -> south
-	// 3 -> south west
-	// 4 -> west
-	// 5 -> north west
-	// 6 -> north
-	// 7 -> north east
+	// 1 -> south
+	// 2 -> west
+	// 3 -> north
 	
 	protected int power;
 	protected boolean canAttack, attacking;
-	protected int hp;
-	
-	protected Animation currAnim;
+	protected int hp, maxHp;
 	
 	protected int id; // used to track object types for collisions
 	// id list:
 	// 0 -> player
 	// 1 -> enemy/hostile
 	// 2 -> NPC/passive
-	// 3 -> item
 	
-	//TEMP, could be used for bounds debugging later
+	// used for bounds debugging
 	Color c;
+	
+	protected Inventory inv;
+	protected Item currItem;
+	
+	protected boolean hurt;
+	protected int hurtTimer = 10, dieTimer = 70, healTimer = 100;
+	
+	protected HashMap<String, Animation> animations = new HashMap<>();
+	protected Animation currAnim;
 	
 	// TEMP: need to add animations/images
 	public GameObject(float x, float y, int width, int height, int id, Color c, int damageAreaRad, int strikeAreaRad, int power, int hp) {
@@ -74,9 +79,13 @@ public abstract class GameObject {
 		this.attacking = false;
 		// tracks health points
 		this.hp = hp;
+		this.maxHp = hp;
+		this.inv = new Inventory(8);
+		this.currItem = null;
 	}
 	
 	public abstract void tick(Map m);
+	protected abstract void setDirection();
 	
 	public void render(Graphics2D g) {
 		
@@ -86,6 +95,11 @@ public abstract class GameObject {
 			g.fill(bounds);
 			g.setColor(c.darker().darker());
 			g.draw(bounds);
+			
+			// draw current Item
+			if(currItem != null) {
+				currItem.render(g);
+			}
 			
 			// draw animation
 			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
@@ -106,8 +120,27 @@ public abstract class GameObject {
 			g.setColor(Colors.black);
 			g.draw(strikeArea);
 		} else {
+			// draw current Item
+			if(currItem != null) {
+				currItem.render(g);
+			}
+			
 			// draw animation
 			g.drawImage(currAnim.getCurrentFrame(), (int)x, (int)y, Game.TILE_SIZE, Game.TILE_SIZE, null);
+			
+			if(hp < maxHp) {
+				// draw background
+				g.setColor(Colors.black.brighter());
+				g.fillRect(getCenterX() - maxHp/2, (int)y - 20, maxHp + 4, 16);
+				// draw health bar
+				g.setColor(Colors.green);
+				g.fillRect(getCenterX() - maxHp/2 + 2, (int)y - 18, hp, 12);
+			}
+			
+			if(hurt) {
+				g.setColor(Colors.red);
+				g.fillOval(bounds.x + bounds.width/4, bounds.y, bounds.width/2, bounds.height);
+			}
 		}
 	}
 	
@@ -128,8 +161,12 @@ public abstract class GameObject {
 		this.strikeArea.y = (int)this.getCenterY() - strikeArea.height/2;
 	}
 	
+	protected void setAnimations(HashMap<String, Animation> animations) {
+		this.animations = animations;
+		this.currAnim = animations.get("idle-down");
+	}
+	
 	protected void tileCollide(Map m) {
-		
 		for(Tile t : m.getTiles()) {
 			if(topBounds.intersects(t.getBounds()) && t.isSolid()) {
 				this.y = t.getBounds().y + Game.TILE_SIZE;
@@ -164,12 +201,20 @@ public abstract class GameObject {
 		return bounds.x;
 	}
 	
+	public void setX(float x) {
+		this.x = x;
+	}
+	
 	public int getCenterX() {
 		return bounds.x + bounds.width/2;
 	}
 	
 	public int getY() {
 		return bounds.y;
+	}
+	
+	public void setY(float y) {
+		this.y = y;
 	}
 	
 	public int getCenterY() {
@@ -184,6 +229,10 @@ public abstract class GameObject {
 		return damageArea;
 	}
 	
+	public Rectangle getStrikeArea() {
+		return strikeArea;
+	}
+	
 	public int getHP() {
 		return hp;
 	}
@@ -194,6 +243,7 @@ public abstract class GameObject {
 	
 	public void damage(int amt) {
 		this.hp -= amt;
+		hurt = true;
 	}
 	
 	public void heal(int amt) {
@@ -214,6 +264,14 @@ public abstract class GameObject {
 	
 	public void setPower(int power) {
 		this.power = power;
+	}
+	
+	public Inventory getInventory() {
+		return inv;
+	}
+	
+	public int getDieTimer() {
+		return dieTimer;
 	}
 	
 }

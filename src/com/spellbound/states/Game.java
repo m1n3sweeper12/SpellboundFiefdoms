@@ -1,15 +1,14 @@
 package com.spellbound.states;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 
+import com.spellbound.inventory.Inventory;
 import com.spellbound.main.Main;
 import com.spellbound.objects.Camera;
 import com.spellbound.objects.EnemyTest;
@@ -23,6 +22,7 @@ import com.spellbound.tiles.Tile;
 import com.spellbound.utils.Colors;
 import com.spellbound.utils.KeyManager;
 import com.spellbound.utils.SpriteHandler;
+import com.spellbound.utils.Time;
 
 public class Game extends State {
 	
@@ -50,6 +50,8 @@ public class Game extends State {
 	// TEMP, for testing 
 	Map test, currentMap;
 	
+	private Inventory UIInv;
+	
 	public Game(Main main) {
 		super(main);
 		
@@ -69,6 +71,7 @@ public class Game extends State {
 		
 		// TEMP, will be handled using implemented file system
 		player = new Player(64, 64, Game.TILE_SIZE, Game.TILE_SIZE, Game.TILE_SIZE + 10);
+		player.readPlayer("res/properties/playerproperties.txt");
 		objects.add(player);
 		
 		e = new EnemyTest(256, 256, Game.TILE_SIZE, Game.TILE_SIZE);
@@ -83,6 +86,15 @@ public class Game extends State {
 		
 		// TEMP
 		System.out.println("Color Key:\nblue -> player\nred -> hostile\ngreen -> passive");
+		
+		UIInv = new Inventory(1);
+		
+		Time.getTime("res/properties/time.txt");
+	}
+	
+	public static void save() {
+		Time.setTime("res/properties/time.txt");
+		player.writePlayer("res/properties/playerproperties.txt");
 	}
 	
 	public static void playerAttack() {
@@ -94,6 +106,45 @@ public class Game extends State {
 		}
 	}
 	
+	public static void enemyAttack(Hostile enemy) {
+		if(enemy.getState() == MOBSTATES.Attack) {
+			Line2D.Double attackLine = getAttackLine((GameObject)enemy);
+			if(attackLine.intersects(player.getDamageArea())) {
+				if(enemy.getStrikeCool() <= 0) {
+					player.damage(enemy.getPower());
+					enemy.setStrikeCool(100);
+				} else {
+					enemy.setStrikeCool(enemy.getStrikeCool() - 1);
+				}
+			}
+			
+			enemy.setState(MOBSTATES.Chase);
+		}
+	}
+	
+	public static void enemyChase(Hostile enemy) {
+		if(enemy.getState() == MOBSTATES.Chase) {
+			if(enemy.getCenterX() > player.getCenterX()) {
+				enemy.setX(enemy.getX() - enemy.getChaseSpeed());
+				enemy.setXDir(-1);
+			}
+			if(enemy.getCenterX() < player.getCenterX()) {
+				enemy.setX(enemy.getX() + enemy.getChaseSpeed());
+				enemy.setXDir(1);
+			}
+			if(enemy.getCenterY() > player.getCenterY()) {
+				enemy.setY(enemy.getY() - enemy.getChaseSpeed());
+				enemy.setYDir(-1);
+			}
+			if(enemy.getCenterY() < player.getCenterY()) {
+				enemy.setY(enemy.getY() + enemy.getChaseSpeed());
+				enemy.setYDir(1);
+			}
+		}
+		
+		enemy.setDirection();
+	}
+	
 	private static Line2D.Double getAttackLine(GameObject o) {
 		Line2D.Double l;
 		
@@ -102,39 +153,30 @@ public class Game extends State {
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY());
 			break;
-		case 1: // south east
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() + o.getStrikeDist()), (double)(o.getCenterY() + o.getStrikeDist()));
-			break;
-		case 2: // south
+		case 1: // south
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX()), (double)o.getCenterY() + o.getStrikeDist());
 			break;
-		case 3: // south west
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() + o.getStrikeDist());
-			break;
-		case 4: // west
+		case 2: // west
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY());
 			break;
-		case 5: // north west
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() - o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
-			break;
-		case 6: // north
+		case 3: // north
 			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
 					(double)(o.getCenterX()), (double)o.getCenterY() - o.getStrikeDist());
-			break;
-		case 7: // north east
-			l = new Line2D.Double((double)o.getCenterX(), (double)o.getCenterY(),
-					(double)(o.getCenterX() + o.getStrikeDist()), (double)o.getCenterY() - o.getStrikeDist());
 			break;
 		default:
 			l = new Line2D.Double();
 		}
 		
 		return l;
+	}
+	
+	private void updateUIInv() {
+		UIInv = new Inventory(player.getInventory().getSlots());
+		for(int i = 0; i < player.getInventory().getItems().size(); i++) {
+			UIInv.addItem(player.getInventory().getItems().get(i), i);
+		}
 	}
 	
 	private void sortObjects() {
@@ -144,27 +186,18 @@ public class Game extends State {
 	
 	@Override
 	public void tick() {
+		Time.tick();
+		
 		// infinite running in debug mode
 		if(debugMode) {
 			player.setRunStamina(200);
 		}
 		
 		// only tick tiles that are visible on screen
-		for(Tile t : currentMap.getTiles()) {
-			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
-					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
-					&& t.getBounds().y > (player.getY() - Game.SCREEN_HEIGHT)
-					&& t.getBounds().y < (player.getY() + Game.SCREEN_HEIGHT)) {
-				t.tick();
-			}
-		}
+		tickTiles();
 		
-		// make enemies chase player
-		for(Hostile h : enemies) {
-			if(h.isPlayerSeen()) {
-				h.setState(MOBSTATES.Chase);
-			}
-		}
+		// controls player/enemy sight handling
+		setHostileSight();
 		
 		// tick camera
 		cam.tick(player);
@@ -175,11 +208,13 @@ public class Game extends State {
 		}
 		
 		// remove objects if health reaches 0
-		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0);
-		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0);
-		objects.removeIf(ob -> ob.getHP() <= 0);
+		enemies.removeIf(ob -> ob.getID() == 1 && ob.getHP() <= 0 && ob.getDieTimer() <= 0);
+		passives.removeIf(ob -> ob.getID() == 2 && ob.getHP() <= 0 && ob.getDieTimer() <= 0);
+		objects.removeIf(ob -> ob.getHP() <= 0 && ob.getDieTimer() <= 0);
 		
 		sortObjects();
+		
+		updateUIInv();
 		
 		// TEMP, for debugging
 		if(KeyManager.getKey(KeyEvent.VK_X) && debugToggle) {
@@ -198,9 +233,59 @@ public class Game extends State {
 		g.setColor(Colors.black);
 		g.fillRect(0, 0, main.getWidth(), main.getHeight());
 		
+		// render tiles and objects within camera view
 		g.translate(-cam.getX(), -cam.getY());
 		
 		// only render tiles that are visible on screen
+		renderTiles(g);
+		
+		// render objects
+		renderObjects(g);
+		
+		g.translate(cam.getX(), cam.getY());
+		
+		// NIGHT MODE
+		if(Time.time != null) {
+			if(Time.time.equals("night") || Time.time.equals("early morning")) {
+				g.setColor(new Color(Colors.blue.getRed(), Colors.blue.getGreen(), Colors.blue.getBlue(), 100));
+				g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			}
+		}
+		
+		// renders UI over camera view
+		renderUI(g);
+	}
+	
+	// ***TICK METHODS*** //
+	
+	private void tickTiles() {
+		for(Tile t : currentMap.getTiles()) {
+			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
+					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
+					&& t.getBounds().y > (player.getY() - Game.SCREEN_HEIGHT)
+					&& t.getBounds().y < (player.getY() + Game.SCREEN_HEIGHT)) {
+				t.tick();
+			}
+		}
+	}
+	
+	private void setHostileSight() {
+		for(Hostile h : enemies) {
+			if(h.getBounds().intersects(player.getBounds())) {
+				h.setState(MOBSTATES.Attack);
+			}
+			
+			if(h.getStrikeArea().intersects(player.getStrikeArea())) {
+				h.setPlayerSeen(true);
+			} else {
+				h.setPlayerSeen(false);
+			}
+		}
+	}
+	
+	// ***RENDER METHODS*** //
+	
+	private void renderTiles(Graphics2D g) {
 		for(Tile t : currentMap.getTiles()) {
 			if(t.getBounds().x > (player.getX() - Game.SCREEN_WIDTH)
 					&& t.getBounds().x < (player.getX() + Game.SCREEN_WIDTH)
@@ -209,18 +294,19 @@ public class Game extends State {
 				t.render(g);
 			}
 		}
-		
-		// render objects
+	}
+	
+	private void renderObjects(Graphics2D g) {
 		for(GameObject o : objects) {
 			o.render(g);
+			if(debugMode) {
+				g.setColor(Colors.white);
+				g.draw(Game.getAttackLine(o));
+			}
 		}
-		
-		// DEBUG MODE
-		
-		g.translate(cam.getX(), cam.getY());
-		
-		// *** GUI ***
-		
+	}
+	
+	private void renderUI(Graphics2D g) {
 		// render player stamina bar
 		g.setColor(Colors.white);
 		g.setFont(new Font("Monospaced", Font.PLAIN, 18));
@@ -239,6 +325,40 @@ public class Game extends State {
 		g.fillRect(150, 10, (int)player.getRunStamina(), 20);
 		g.setColor(Colors.black);
 		g.drawRect(150, 10, 200, 20);
+		
+		// render player health bar
+		/*
+		g.setColor(Colors.white);
+		g.setFont(new Font("Monospaced", Font.PLAIN, 18));
+		g.drawString("Health:", 10, 75);
+		g.setColor(Colors.white.darker().darker());
+		g.fillRect(150, 60, 200, 20);
+		if(player.getHP() < 50) {
+			g.setColor(Colors.red);
+		} else if(player.getHP() < 100) {
+			g.setColor(Colors.orange);
+		} else if(player.getHP() < 150) {
+			g.setColor(Colors.yellow);
+		} else {
+			g.setColor(Colors.green);
+		}
+		g.fillRect(150, 60, (int)player.getHP(), 20);
+		g.setColor(Colors.black);
+		g.drawRect(150, 60, 200, 20);
+		*/
+		
+		// render player inventory
+		player.getInventory().render(g);
+		
+		// render time of day and day count
+		g.setFont(new Font("Monospaced", Font.BOLD, 14));
+		g.setColor(Colors.white);
+		g.fillRect(SCREEN_WIDTH - 255, 10, 240, 75);
+		g.setColor(Colors.black);
+		g.drawRect(SCREEN_WIDTH - 255, 10, 240, 75);
+		g.drawString("Day " + Time.day, SCREEN_WIDTH - 250, 25);
+		g.drawString(Time.hour + ":" + String.format("%02d", Time.minute), SCREEN_WIDTH - 250, 50);
+		g.drawString("Time of Day: " + Time.time, SCREEN_WIDTH - 250, 75);
 		
 		// DEBUG MODE
 		if(debugMode) {

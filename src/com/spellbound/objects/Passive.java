@@ -21,5 +21,10 @@ public class Passive extends GameObject {
 		
 		tileCollide(m);
 	}
+
+	@Override
+	protected void setDirection() {
+		
+	}
 	
 }

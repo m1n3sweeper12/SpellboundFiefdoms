@@ -3,72 +3,149 @@ package com.spellbound.objects;
 import java.awt.Rectangle;
 import java.util.Random;
 
+import com.spellbound.inventory.Item;
+import com.spellbound.states.Game;
 import com.spellbound.tiles.Map;
-import com.spellbound.utils.Circle;
 import com.spellbound.utils.Colors;
+import com.spellbound.utils.ImageLoader;
 import com.spellbound.utils.SpriteHandler;
 
 public abstract class Hostile extends GameObject {
 	
-	protected boolean playerSeen;
-	protected MOBSTATES state;
+	// state variables
+	protected boolean playerSeen; // if player is seen, sets to chase state
+	protected MOBSTATES state; // tracks current state of mobs
 	
 	// roaming variables
 	protected Rectangle roamArea; // tracks area in which hostile can roam
 	private int moveTimer, roamSpeed;	// moveTimer randomly selects time between movements
 										// roamSpeed tracks hostile speed while roaming
-	private int xDir, yDir, xDist, yDist; // Dir tracks direction of movement, dist tracks distance of movement
+										// chaseSpeed tracks hostile speed while chasing
+	// movement variables
+	// Dir tracks direction of movement, Dist tracks distance of movement
+	private int xDir, yDir, xDist, yDist;
+	private boolean canMove = true;
 	
-	private Random r;
-	
-	protected Circle strikeArea;
+	private Random r; // for random roaming directions
+	private float chaseSpeed; // tracks speed while chasing player
+	private int strikeCool = 0; // tracks enemy attack cooldown
 	
 	public Hostile(float x, float y, int width, int height, int moveDist, int roamSpeed, int damageAreaRad, int strikeAreaRad, int power, int hp) {
 		super(x, y, width, height, 1, Colors.red, damageAreaRad, strikeAreaRad, power, hp);
 		this.state = MOBSTATES.Roam;
 		this.roamArea = new Rectangle((int)(x - moveDist), (int)(y - moveDist), moveDist*2, moveDist*2);
 		this.roamSpeed = roamSpeed;
-		this.strikeArea = new Circle(x + width/2, y + height/2, strikeAreaRad);
+		this.chaseSpeed = 1.5f;
 		
 		this.r = new Random((long)(x + y));
+		inv.addItem(new Item("Test", "test", 3, 64, 64, ImageLoader.loadImage("res/sprites/items/test-item.png")), 0);
 	}
-
+	
 	@Override
 	public void tick(Map m) {
-		switch(state) {
-		case Roam:
-			roam();
-			break;
-		case Chase:
-			chase();
-			break;
-		case Attack:
-			attack();
-			break;
+		checkState();
+		tickState();
+		
+		checkHealth();
+		
+		trackItem();
+		
+		if(canMove)
+			move();
+		
+		setAnimation();
+		setDirection();
+		
+		tileCollide(m);
+	}
+	
+	private void checkHealth() {
+		if(hp <= 0) {
+			dieTimer--;
+			state = MOBSTATES.Die;
+			canMove = false;
 		}
 		
-		this.move();
+		if(hurt) {
+			hurt();
+		}
+	}
+	
+	private void tickState() {
+		switch(state) {
+		case Attack:
+			attack();
+		case Die:
+			die();
+		case Chase:
+			chase();
+		case Roam:
+			roam();
+		}
+	}
+	
+	private void checkState() {
+		// if not attacking, either chase, roam, or die
+		if(state != MOBSTATES.Attack) {
+			// run die method if dying
+			if(state != MOBSTATES.Die) {
+				if(playerSeen) {
+					state = MOBSTATES.Chase;
+				} else {
+					state = MOBSTATES.Roam;
+				}
+			}
+		}
+	}
+	
+	private void hurt() {
+		hurtTimer--;
 		
-		this.setAnimation();
-		
-		currAnim.run();
-		
-		this.tileCollide(m);
+		if(hurtTimer <= 0) {
+			hurt = false;
+		}
+	}
+	
+	private void trackItem() {
+		currItem = inv.getItems().getFirst();
+		currItem.setX(this.getCenterX());
+		currItem.setY(this.getCenterY());
 	}
 	
 	private void setAnimation() {
-		if(xDist > 0) {
-			if(xDir > 0) currAnim = SpriteHandler.enemy_walkR;
-			else if(xDir < 0) currAnim = SpriteHandler.enemy_walkL;
-		} else if(yDist > 0) {
-			if(yDir > 0) currAnim = SpriteHandler.enemy_walkD;
-			else if(yDir < 0) currAnim = SpriteHandler.enemy_walkU;
-		} else {
-			if(xDir > 0) currAnim = SpriteHandler.enemy_idleR;
-			else if(xDir < 0) currAnim = SpriteHandler.enemy_idleL;
-			else if(yDir > 0) currAnim = SpriteHandler.enemy_idleD;
-			else if(yDir < 0) currAnim = SpriteHandler.enemy_idleU;
+		if(state == MOBSTATES.Roam) {
+			if(xDist > 0) {
+				if(xDir > 0) currAnim = SpriteHandler.enemy_walkR;
+				else if(xDir < 0) currAnim = SpriteHandler.enemy_walkL;
+			} else if(yDist > 0) {
+				if(yDir > 0) currAnim = SpriteHandler.enemy_walkD;
+				else if(yDir < 0) currAnim = SpriteHandler.enemy_walkU;
+			} else {
+				if(xDir > 0) currAnim = SpriteHandler.enemy_idleR;
+				else if(xDir < 0) currAnim = SpriteHandler.enemy_idleL;
+				else if(yDir > 0) currAnim = SpriteHandler.enemy_idleD;
+				else if(yDir < 0) currAnim = SpriteHandler.enemy_idleU;
+			}
+		} else if(state == MOBSTATES.Die) {
+			if(xDir > 0) currAnim = SpriteHandler.enemy_dieR;
+			else if(xDir < 0) currAnim = SpriteHandler.enemy_dieL;
+			else if(yDir > 0) currAnim = SpriteHandler.enemy_dieD;
+			else if(yDir < 0) currAnim = SpriteHandler.enemy_dieU;
+		} else if(state == MOBSTATES.Chase) {
+			if(xDir > 0) currAnim = SpriteHandler.enemy_runR;
+			else if(xDir < 0) currAnim = SpriteHandler.enemy_runL;
+			else if(yDir > 0) currAnim = SpriteHandler.enemy_runD;
+			else if(yDir < 0) currAnim = SpriteHandler.enemy_runU;
 		}
+		
+		currAnim.run();
+	}
+	
+	public void setDirection() {
+		if(xDir > 0) direction = 0; // east
+		else if(xDir < 0) direction = 2; // west
+		else if(yDir > 0) direction = 1; // south
+		else if(yDir < 0) direction = 3; // north
 	}
 	
 	public void roam() {
@@ -104,11 +181,25 @@ public abstract class Hostile extends GameObject {
 	}
 	
 	public void chase() {
-		
+		Game.enemyChase(this);
 	}
 	
 	public void attack() {
-		
+		Game.enemyAttack(this);
+	}
+	
+	public void die() {
+		switch(direction) {
+		case 0: // east
+			currAnim = SpriteHandler.enemy_dieR;
+		case 1: // south
+			currAnim = SpriteHandler.enemy_dieD;
+		case 2: // west
+			currAnim = SpriteHandler.enemy_dieL;
+		case 3: // north
+			currAnim = SpriteHandler.enemy_dieU;
+			break;
+		}
 	}
 	
 	public boolean isPlayerSeen() {
@@ -127,8 +218,24 @@ public abstract class Hostile extends GameObject {
 		this.state = state;
 	}
 	
-	public Circle getStrikeArea() {
-		return strikeArea;
+	public float getChaseSpeed() {
+		return chaseSpeed;
+	}
+	
+	public int getStrikeCool() {
+		return strikeCool;
+	}
+	
+	public void setStrikeCool(int strikeCool) {
+		this.strikeCool = strikeCool;
+	}
+	
+	public void setXDir(int xDir) {
+		this.xDir = xDir;
+	}
+	
+	public void setYDir(int yDir) {
+		this.yDir = yDir;
 	}
 
 }
